@@ -191,6 +191,26 @@ input[type=date].t{min-height:50px}
 .sch tr.ft td,.sch tr.ft th.nm1{font-size:11px;font-weight:600;color:var(--dim)}
 .sch tr.ft td.ok{color:var(--ok)}
 .sch tr.ft td.lo{color:var(--bad)}
+
+.sch td{width:27px;min-width:27px;height:34px;border-right:1px solid rgba(241,239,230,.28);border-bottom:1px solid rgba(241,239,230,.22)}
+.sch th{border-right:1px solid rgba(241,239,230,.28);border-bottom:1px solid rgba(241,239,230,.22)}
+.sch td.dg,.sch th.dg{border-right:3px solid rgba(235,178,78,.75)}
+.sch th.dh{font-size:12px;padding:6px 0}
+.sch th.dh.p0{background:#1d4033}
+.sch th.dh.p1{background:#2b5a48}
+.sch td.e.p0{background:#112d26}
+.sch td.e.p1{background:#1b3f33}
+.sch th.ch{height:22px;font-size:11px;font-weight:700}
+.sch th.c1{background:rgba(142,197,255,.3);color:#d6ebff}
+.sch th.c2{background:rgba(127,216,169,.3);color:#d4f6e5}
+.sch th.c3{background:rgba(255,148,96,.3);color:#ffe0d0}
+.sch th.c4{background:rgba(201,155,255,.3);color:#eddcff}
+.sch td.on{box-shadow:inset 0 0 0 1px rgba(14,38,33,.45)}
+.sch th.dh.tdy{background:var(--crema);color:var(--crema-ink)}
+.sch td.e.tdy.p0,.sch td.e.tdy.p1{background:rgba(235,178,78,.3)}
+.sch tr.me td.e.p0,.sch tr.me td.e.p1{outline:0}
+.sch tr.me td{border-top:1px solid rgba(235,178,78,.8);border-bottom:1px solid rgba(235,178,78,.8)}
+.sch tr.ft td{height:26px}
 </style></head>
 <body><div id="app">
 <header id="hd"><div class="brand">Root<span>Coffee</span></div><div id="ngay"></div></header>
@@ -289,13 +309,13 @@ $("scr").innerHTML=h;if(S.lt==="tuan")lichTuan();else if(S.lt==="dk")lichDk();el
 function colOf(names,n){var i=names.indexOf(n);return PAL[(i<0?0:i)%PAL.length]}
 function tblLich(days,names,grid,can,o){
 var h='<div class="lw" id="lw"><table class="sch"><tr><th class="nm1" rowspan="2">Tên</th>';
-days.forEach(function(d){h+='<th colspan="4" class="dh'+(d.iso===o.hom?" tdy":"")+'">'+esc(thuNgan(d.thu))+'<small>'+esc(d.dm)+'</small></th>'});
+days.forEach(function(d,di){h+='<th colspan="4" class="dh dg p'+(di%2)+(d.iso===o.hom?" tdy":"")+'">'+esc(thuNgan(d.thu))+'<small>'+esc(d.dm)+'</small></th>'});
 h+='</tr><tr>';
-days.forEach(function(d){for(var c=1;c<=4;c++)h+='<th class="ch">'+c+'</th>'});
+days.forEach(function(d,di){for(var c=1;c<=4;c++)h+='<th class="ch c'+c+(c===4?" dg":"")+'">'+c+'</th>'});
 h+='</tr>';
 names.forEach(function(n){var me=n===S.ten,g=grid(n)||[],col=colOf(names,n),ed=o.edit&&me;
 h+='<tr'+(me?' class="me"':'')+'><th class="nm1">'+esc(n)+'</th>';
-for(var i=0;i<28;i++){var on=!!g[i],d=days[Math.floor(i/4)]||{},cl=on?"on":"e";if(d.iso&&d.iso===o.hom)cl+=" tdy";if(i%4===3)cl+=" dg";if(ed)cl+=" mine";
+for(var i=0;i<28;i++){var on=!!g[i],d=days[Math.floor(i/4)]||{},cl=(on?"on":"e")+" p"+(Math.floor(i/4)%2);if(d.iso&&d.iso===o.hom)cl+=" tdy";if(i%4===3)cl+=" dg";if(ed)cl+=" mine";
 h+='<td class="'+cl+'"'+(on?' style="background:'+col+'"':'')+(ed?' data-cell="'+i+'"':'')+'>'+(on&&ed?'<span style="color:#2B1B06;font-weight:700">✓</span>':'')+'</td>'}
 h+='</tr>'});
 if(can){h+='<tr class="ft"><th class="nm1">Cần</th>';for(var i=0;i<28;i++)h+='<td'+(i%4===3?' class="dg"':'')+'>'+(can[i]==null?"":can[i])+'</td>';h+='</tr>'}
