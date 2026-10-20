@@ -240,6 +240,14 @@ input[type=date].t{min-height:50px}
 #land .rot.flat{padding-left:calc(env(safe-area-inset-left,0px) + 12px);padding-right:calc(env(safe-area-inset-right,0px) + 12px)}
 #land .sch th.nm1{width:70px;min-width:70px;max-width:70px;font-size:11px}
 #land .sch td{height:23px}
+.kr{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 6px;border-bottom:1px solid var(--line);border-radius:10px}
+.kr .kn{font-size:15px;flex:1;line-height:1.3}.kr .kn small{color:var(--dim);font-size:12.5px}
+.kr .ks{display:flex;align-items:center;gap:6px}
+.kr .ks button{width:42px;height:42px;border-radius:12px;border:0;background:var(--bg2);color:var(--txt);font:inherit;font-size:22px;cursor:pointer}
+.kr .ks b{min-width:28px;text-align:center;font-size:17px;font-variant-numeric:tabular-nums}
+.kr.on{background:rgba(235,178,78,.13)}.kr.on .ks b{color:var(--crema)}.kr.on .ks button:last-child{background:var(--crema);color:var(--crema-ink)}
+#sheet .sh{max-height:88vh;overflow:auto}
+label.cta.sm2{cursor:pointer}
 </style></head>
 <body><div id="app">
 <header id="hd"><div class="brand">Root<span>Coffee</span></div><div id="ngay"></div></header>
@@ -282,7 +290,7 @@ function tabs(on){var n=$("tabs"),show=!!on&&!!S.st&&!S.qlMode;n.hidden=!show;$(
  if(show){[].forEach.call(n.querySelectorAll("button"),function(b){b.classList.toggle("on",b.getAttribute("data-t")===S.tab)});
   var c=S.st&&S.st.doica?S.st.doica.filter(function(q){return q.choToi}).length:0,bd=$("tbd");bd.textContent=c||"";bd.hidden=!c;hopPoll()}}
 function sheet(on,h){var s=$("sheet");if(on){s.innerHTML='<div class="sh"><div class="gr"></div>'+h+'</div>';s.className="on"}else{s.className="";s.innerHTML=""}}
-function showNames(){S.ten="";S.pin="";S.st=null;S.anh=null;S.mode="";S.ql=null;S.edit=-1;S.xanh=null;S.xly="";S.xkey="";S.qlMode=false;S.kc=null;S.lt="tuan";S.lw="";S.lc=null;S.dkd=null;S.dkf=null;S.hop=null;S.hlast=0;S.xpq=null;closeLand();S.tab="home";$("app").classList.remove("wide");stopCam();clearTimeout(S.doneT);ribbon();hero(false);tabs(false);sheet(false);
+function showNames(){S.ten="";S.pin="";S.st=null;S.anh=null;S.mode="";S.ql=null;S.edit=-1;S.xanh=null;S.xly="";S.xkey="";S.qlMode=false;S.kc=null;S.lt="tuan";S.lw="";S.lc=null;S.dkd=null;S.dkf=null;S.hop=null;S.hlast=0;S.xpq=null;S.kho=null;closeLand();S.tab="home";$("app").classList.remove("wide");stopCam();clearTimeout(S.doneT);ribbon();hero(false);tabs(false);sheet(false);
  var keys="";[1,2,3,4,5,6,7,8,9].forEach(function(k){keys+='<button data-k="'+k+'">'+k+'</button>'});
  keys+='<button class="ghost" disabled></button><button data-k="0">0</button><button class="ghost" data-k="del" aria-label="Xóa số">'+ICO_DEL+'</button>';
  $("scr").innerHTML='<div class="lg"><div class="lgm">R</div><h1 class="h" style="text-align:center">Nhập mã PIN</h1><p class="sub" style="text-align:center">Mã 4 số của bạn. Dùng để chấm công, kết ca và nhập kho.</p><div class="dots" id="dots"><i></i><i></i><i></i><i></i></div><div id="pmsg"></div><div class="pad">'+keys+'</div></div>';
@@ -311,7 +319,7 @@ var h='<div class="top"><h1 class="h" style="font-size:22px;margin-bottom:10px">
 if(hn.ghiTren)h+='<p class="sub">'+esc(hn.ghiTren)+'</p>';
 if(hn.loai){h+='<button class="cta big" id="cam">'+ICO_CAM+esc(hn.nut)+'</button>';if(hn.ghi)h+='<p class="note">'+esc(hn.ghi)+'</p>'}
 else h+='<div class="cta off big">'+esc(hn.ghi||"Chưa đến giờ chấm công")+'</div>';
-h+='<div class="two" style="margin-top:12px"><button class="cta ghost sm2" id="goxin">Xin đi trễ</button><button class="cta ghost sm2" id="goxp">Xin phép</button></div>';
+h+='<div class="two" style="margin-top:12px"><button class="cta ghost sm2" id="goxin">Xin đi trễ</button><button class="cta ghost sm2" id="goxp">Xin phép</button></div>';h+='<div class="two" style="margin-top:10px"><button class="cta ghost sm2" id="gokn">Nhập kho</button><button class="cta ghost sm2" id="gokx">Xuất kho</button></div>';
 h+='<h2 class="s" style="margin-top:22px">Ca hôm nay</h2>';
 if(!st.hom.length)h+='<p class="note" style="text-align:left;margin-top:0">Hôm nay bạn không có ca.</p>';
 st.hom.forEach(function(b){h+='<div class="blk"><div class="t"><div><b>'+esc(b.nhan)+'</b><span class="g">'+esc(b.gio)+'</span></div>'+chip(b.tt,b.tre)+'</div><div class="d"><div><span>Vào</span>'+(b.vao||"–")+'</div><div><span>Ra</span>'+(b.ra||"–")+'</div></div>'+(b.xin?'<div class="sm">Đã xin trễ '+b.xin+' phút</div>':'')+(b.tc||[]).map(function(t){return'<div class="sm">Tăng ca '+t.phut+' phút ('+(t.loai==="Sớm"?"vào sớm":"tan muộn")+'): '+(t.tt==="Đã duyệt"?"đã duyệt "+t.pd+" phút":t.tt==="Chờ duyệt"?"chờ chủ quán duyệt":"không duyệt")+'</div>'}).join("")+'</div>'});
@@ -601,7 +609,48 @@ gs("ccQuanLyXepSua",S.pin,S.xep.tu,p.ten,i,v).then(function(r){S.xbusy=0;if(r&&r
 function xepLai(){if(S.xbusy)return;S.xbusy=1;S.xcf=0;gs("ccQuanLyXepLai",S.pin,S.xep.tu).then(function(r){S.xbusy=0;if(r&&r.ok){xepSet(r.xep);toast("Đã xếp lại theo đăng ký.")}else toast((r&&r.msg)||"Chưa xếp lại được.")}).catch(function(){S.xbusy=0;toast("Mất kết nối.")})}
 function xepDuyet(){if(S.xbusy)return;if(!S.xcf){S.xcf=1;xepDraw();return}S.xbusy=1;S.xcf=0;
 gs("ccQuanLyXepDuyet",S.pin,S.xep.tu).then(function(r){S.xbusy=0;if(r&&r.ok){xepSet(r.xep);toast(r.msg||"Đã chốt lịch.")}else{toast((r&&r.msg)||"Chưa chốt được.");xepDraw()}}).catch(function(){S.xbusy=0;toast("Mất kết nối, chưa chốt. Bấm lại.");xepDraw()})}
+
+var KHO=[["Sữa đặc","Thùng","Lon",0],["Sữa tươi","Thùng","Hộp",0],["Sữa Oatside","Thùng","Hộp",0],["Siro bạc hà","Thùng","Chai",0],["Bột kem muối","Thùng","Bịch",0],["Bột frappe","Thùng","Bịch",0],["Matcha","Bịch","Bịch",0],["Cacao","Bịch","Bịch",0],["Đường 5kg","Bịch 500g","Bịch 500g",0],["Caramel","Thùng","Chai",0],["Cà phê phin (bột)","Bịch 1kg","Bịch 1kg",1],["Cà phê máy (hạt)","Bịch 1kg","Bịch 1kg",1],["Rich lùn","Hộp","Hộp",1],["Rich cao","Hộp","Hộp",1],["Tem dán ly","Cuộn lớn","Cái",1],["Giấy nến","Xấp","Xấp",1],["Ống hút","Cây lớn","Bịch",1],["Muỗng","Bịch","Bịch",1],["Bịch chữ T","Kg","Kg",1],["Bịch đôi","Kg","Kg",1],["Băng keo giấy","Cái","Cái",1],["Băng keo trong","Cái","Cái",1],["Pin","Cặp","Cặp",1],["Nước rửa chén","Chai","Chai",1],["Nước lau nhà","Chai","Chai",1],["Giấy rút","Bịch","Bịch",1],["Ly S","Thùng","Cây",2],["Nắp ly S","Thùng","Cây",2],["Ly M","Thùng","Cây",2],["Ly L","Thùng","Cây",2],["Nắp ly M-L","Thùng","Cây",2]];
+var KHOG=["A · Sữa, siro, bột","B · Cà phê, bao bì, vệ sinh","C · Ly và nắp"];
+function showKho(k){touch();S.tab="home";S.mode="";hero(false);tabs(true);$("app").classList.remove("wide");if(!S.kho||S.kho.k!==k)S.kho={k:k,q:{},ly:"Dùng bình thường",anh:[],ghi:""};khoDraw();window.scrollTo(0,0)}
+function khoDraw(){var K=S.kho,nhap=K.k==="nhap";
+var h=back2()+'<h1 class="h">'+(nhap?"Nhập kho":"Xuất kho")+'</h1><p class="sub">'+(nhap?"Ghi khi nhận hàng. Chỉ bấm + ở dòng có nhận, số lượng tính theo đơn vị trong ngoặc.":"Ghi mỗi khi bóc seal. Chỉ bấm + ở dòng đã bóc, số lượng tính theo đơn vị trong ngoặc. Hàng hỏng hoặc đổ bỏ thì chọn lý do Hủy và gửi riêng một lần.")+'</p>';
+var g=-1;KHO.forEach(function(it,i){if(it[3]!==g){g=it[3];h+='<h2 class="s">'+KHOG[g]+'</h2>'}var q=K.q[i]||0;
+h+='<div class="kr'+(q?" on":"")+'" id="kr'+i+'"><span class="kn">'+esc(it[0])+' <small>['+esc(nhap?it[1]:it[2])+']</small></span><span class="ks"><button data-kq="'+i+',-1" aria-label="Giảm">−</button><b id="kv'+i+'">'+q+'</b><button data-kq="'+i+',1" aria-label="Tăng">+</button></span></div>'});
+if(!nhap)h+='<label class="lb" for="kly">Lý do</label><select id="kly"><option>Dùng bình thường</option><option>Hủy / đổ bỏ (làm hỏng)</option></select>';
+h+='<label class="lb">Ảnh '+(nhap?"(chụp hàng hoặc hóa đơn)":"(bắt buộc, tối đa 3 ảnh)")+'</label><div id="kph"></div><div class="two"><label class="cta ghost sm2" for="kf1">Chụp ảnh</label><label class="cta ghost sm2" for="kf2">Chọn ảnh</label></div><input type="file" accept="image/*" capture="environment" id="kf1" hidden><input type="file" accept="image/*" id="kf2" hidden>';
+h+='<label class="lb" for="kghi">Ghi chú (nếu có)</label><input class="t" id="kghi" maxlength="200" placeholder="Ví dụ: thiếu 1 thùng, hàng móp">';
+h+='<div class="tot"><span>Đã chọn</span><b id="kcnt">0 dòng</b></div><button class="cta" id="kxem" style="margin-top:16px">Xem lại và gửi</button>';
+$("scr").innerHTML=h;if($("kly"))$("kly").value=K.ly;$("kghi").value=K.ghi;khoPh();khoCnt()}
+function khoCnt(){var K=S.kho,n=0;KHO.forEach(function(m,i){if(K.q[i]>0)n++});var e=$("kcnt");if(e)e.textContent=n+" dòng"}
+function khoStep(i,d){var K=S.kho;if(!K)return;var mx=K.k==="nhap"?10:5,q=Math.max(0,Math.min(mx,(K.q[i]||0)+d));K.q[i]=q;$("kv"+i).textContent=q;$("kr"+i).classList.toggle("on",q>0);khoCnt()}
+function khoPh(){var K=S.kho,e=$("kph");if(!K||!e)return;e.innerHTML=K.anh.length?K.anh.map(function(a,j){return'<div style="position:relative;display:inline-block;margin:0 10px 10px 0"><img src="'+a+'" alt="Ảnh '+(j+1)+'" style="width:84px;height:84px;object-fit:cover;border-radius:12px;display:block"><button data-kx="'+j+'" aria-label="Bỏ ảnh" style="position:absolute;top:-8px;right:-8px;width:26px;height:26px;border-radius:50%;border:0;background:var(--bad);color:#fff;font-size:16px;line-height:1">×</button></div>'}).join(""):'<p class="sm" style="margin:0 0 10px">Chưa có ảnh.</p>'}
+function khoAnh(f){if(!f||!S.kho)return;if(S.kho.anh.length>=3){toast("Tối đa 3 ảnh.");return}if(f.size>25000000){toast("Ảnh quá lớn. Chọn ảnh khác.");return}
+var u=URL.createObjectURL(f),im=new Image();
+im.onload=function(){var k=Math.min(1,900/Math.max(im.width,im.height)),w=Math.round(im.width*k),h=Math.round(im.height*k),c=document.createElement("canvas");c.width=w;c.height=h;var x=c.getContext("2d");x.drawImage(im,0,0,w,h);URL.revokeObjectURL(u);
+var n=vn(),tx=S.ten+" – "+(S.kho&&S.kho.k==="nhap"?"NHẬP KHO":"XUẤT KHO")+" – "+p2(n.d)+"/"+p2(n.mo)+"/"+n.y+" "+p2(n.h)+":"+p2(n.m),fs=Math.max(14,Math.round(w*0.036)),bh=Math.round(fs*1.9);
+x.fillStyle="rgba(0,0,0,.62)";x.fillRect(0,h-bh,w,bh);x.fillStyle="#fff";x.font="600 "+fs+"px sans-serif";x.textBaseline="middle";x.fillText(tx,Math.round(fs*.6),h-bh/2);
+if(S.kho){S.kho.anh.push(c.toDataURL("image/jpeg",0.72));khoPh()}};
+im.onerror=function(){URL.revokeObjectURL(u);toast("Không đọc được ảnh này. Chọn ảnh khác.")};im.src=u}
+function khoXem(){var K=S.kho;if(!K)return;var nhap=K.k==="nhap",it=[];KHO.forEach(function(m,i){if(K.q[i]>0)it.push(i)});
+if(!it.length){toast("Chưa chọn mặt hàng nào. Bấm + ở dòng cần ghi.");return}
+if(!nhap&&!K.anh.length){toast("Xuất kho cần ít nhất 1 ảnh.");return}
+sheet(true,'<h2>Kiểm tra lại</h2><div class="kv"><span>'+(nhap?"Nhập kho":"Xuất kho")+'</span><b>'+esc(S.ten)+'</b></div>'+(nhap?"":'<div class="kv"><span>Lý do</span><b>'+esc(K.ly)+'</b></div>')+it.map(function(i){var m=KHO[i];return'<div class="kv"><span>'+esc(m[0])+'</span><b>'+K.q[i]+" "+esc(nhap?m[1]:m[2])+'</b></div>'}).join("")+'<div class="kv"><span>Ảnh</span><b>'+K.anh.length+'</b></div>'+(K.ghi.trim()?'<div class="kv"><span>Ghi chú</span><b>'+esc(K.ghi.trim())+'</b></div>':"")+'<button class="cta" id="kgui" style="margin-top:18px">Gửi</button><button class="cta ghost" id="ksua" style="margin-top:10px">Sửa lại</button>')}
+function khoGui(){if(S.busy||!S.kho)return;var K=S.kho,it=[];KHO.forEach(function(m,i){if(K.q[i]>0)it.push([i,K.q[i]])});if(!it.length)return;
+S.busy=true;var b=$("kgui");if(b){b.disabled=true;b.textContent="Đang gửi…"}
+gs("ccKhoGhi",S.ten,S.pin,K.k,K.ly,it,K.anh,K.ghi||"").then(function(r){S.busy=false;
+if(r&&r.ok){sheet(false);S.kho=null;showDone(r)}else{toast((r&&r.msg)||"Chưa gửi được.");if(r&&r.khoa)showNames();else if(b){b.disabled=false;b.textContent="Gửi"}}
+}).catch(function(){S.busy=false;if(b){b.disabled=false;b.textContent="Gửi"}toast("Chưa gửi được vì mất kết nối. Bấm Gửi lại.")})}
+document.addEventListener("change",function(e){var t=e.target;if(!t||!S.kho)return;if(t.id==="kly")S.kho.ly=t.value;else if(t.id==="kf1"||t.id==="kf2"){var f=t.files&&t.files[0];t.value="";khoAnh(f)}});
+document.addEventListener("input",function(e){var t=e.target;if(t&&t.id==="kghi"&&S.kho)S.kho.ghi=t.value});
 function extraClick(t){var q;
+if(t.closest("#gokn"))return showKho("nhap"),true;
+if(t.closest("#gokx"))return showKho("xuat"),true;
+if((q=t.closest("[data-kq]"))){var ka=q.getAttribute("data-kq").split(",");khoStep(+ka[0],+ka[1]);return true}
+if((q=t.closest("[data-kx]"))){S.kho.anh.splice(+q.getAttribute("data-kx"),1);khoPh();return true}
+if(t.closest("#kxem"))return khoXem(),true;
+if(t.closest("#ksua"))return sheet(false),true;
+if(t.closest("#kgui"))return khoGui(),true;
 if((q=t.closest("[data-xy]")))return xpqAct(q.getAttribute("data-xy"),true),true;
 if((q=t.closest("[data-xn]")))return xpqAct(q.getAttribute("data-xn"),false),true;
 if((q=t.closest("[data-xc]")))return xepToggle(q),true;
