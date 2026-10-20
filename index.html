@@ -304,12 +304,13 @@ function login(){S.busy=true;gs("ccDangNhapPin",S.pin).then(function(r){S.busy=f
  }).catch(function(){S.busy=false;S.pin="";dots();$("pmsg").textContent="Mất kết nối. Thử lại sau vài giây."})}
 
 function go(t){closeLand();$("app").classList.remove("lw2");clearTimeout(S.doneT);S.tab=t;S.mode="";S.busy=false;sheet(false);$("app").classList.remove("wide");
- if(t==="lich")showLich();else if(t==="ketca")showKc();else if(t==="tui")showTui();else showHome()}
+ if(t==="lich")showLich();else if(t==="ketca")showKc();else if(t==="tui")showTui();else if(t==="kho")showKhoHome();else showHome()}
 var IC={
  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
  lich:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>',
  ketca:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>',
- tui:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-4 4-6 7.5-6s6.7 2 7.5 6"/></svg>'};
+ kho:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8l8.5-4.5L20.5 8v8.5L12 21l-8.5-4.5z"/><path d="M3.5 8l8.5 4.5L20.5 8M12 12.5V21"/></svg>',
+tui:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c.8-4 4-6 7.5-6s6.7 2 7.5 6"/></svg>'};
 function topbar(t,sub){return '<div class="pg"><h1 class="h" style="margin:0">'+esc(t)+'</h1></div>'+(sub?'<p class="sub" style="margin-top:6px">'+sub+'</p>':'')}
 
 function addDays(iso,n){var d=new Date(iso+"T00:00:00Z");d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)}
@@ -319,7 +320,7 @@ var h='<div class="top"><h1 class="h" style="font-size:22px;margin-bottom:10px">
 if(hn.ghiTren)h+='<p class="sub">'+esc(hn.ghiTren)+'</p>';
 if(hn.loai){h+='<button class="cta big" id="cam">'+ICO_CAM+esc(hn.nut)+'</button>';if(hn.ghi)h+='<p class="note">'+esc(hn.ghi)+'</p>'}
 else h+='<div class="cta off big">'+esc(hn.ghi||"Chưa đến giờ chấm công")+'</div>';
-h+='<div class="two" style="margin-top:12px"><button class="cta ghost sm2" id="goxin">Xin đi trễ</button><button class="cta ghost sm2" id="goxp">Xin phép</button></div>';h+='<div class="two" style="margin-top:10px"><button class="cta ghost sm2" id="gokn">Nhập kho</button><button class="cta ghost sm2" id="gokx">Xuất kho</button></div>';
+h+='<div class="two" style="margin-top:12px"><button class="cta ghost sm2" id="goxin">Xin đi trễ</button><button class="cta ghost sm2" id="goxp">Xin phép</button></div>';
 h+='<h2 class="s" style="margin-top:22px">Ca hôm nay</h2>';
 if(!st.hom.length)h+='<p class="note" style="text-align:left;margin-top:0">Hôm nay bạn không có ca.</p>';
 st.hom.forEach(function(b){h+='<div class="blk"><div class="t"><div><b>'+esc(b.nhan)+'</b><span class="g">'+esc(b.gio)+'</span></div>'+chip(b.tt,b.tre)+'</div><div class="d"><div><span>Vào</span>'+(b.vao||"–")+'</div><div><span>Ra</span>'+(b.ra||"–")+'</div></div>'+(b.xin?'<div class="sm">Đã xin trễ '+b.xin+' phút</div>':'')+(b.tc||[]).map(function(t){return'<div class="sm">Tăng ca '+t.phut+' phút ('+(t.loai==="Sớm"?"vào sớm":"tan muộn")+'): '+(t.tt==="Đã duyệt"?"đã duyệt "+t.pd+" phút":t.tt==="Chờ duyệt"?"chờ chủ quán duyệt":"không duyệt")+'</div>'}).join("")+'</div>'});
@@ -612,7 +613,7 @@ gs("ccQuanLyXepDuyet",S.pin,S.xep.tu).then(function(r){S.xbusy=0;if(r&&r.ok){xep
 
 var KHO=[["Sữa đặc","Thùng","Lon",0],["Sữa tươi","Thùng","Hộp",0],["Sữa Oatside","Thùng","Hộp",0],["Siro bạc hà","Thùng","Chai",0],["Bột kem muối","Thùng","Bịch",0],["Bột frappe","Thùng","Bịch",0],["Matcha","Bịch","Bịch",0],["Cacao","Bịch","Bịch",0],["Đường 5kg","Bịch 500g","Bịch 500g",0],["Caramel","Thùng","Chai",0],["Cà phê phin (bột)","Bịch 1kg","Bịch 1kg",1],["Cà phê máy (hạt)","Bịch 1kg","Bịch 1kg",1],["Rich lùn","Hộp","Hộp",1],["Rich cao","Hộp","Hộp",1],["Tem dán ly","Cuộn lớn","Cái",1],["Giấy nến","Xấp","Xấp",1],["Ống hút","Cây lớn","Bịch",1],["Muỗng","Bịch","Bịch",1],["Bịch chữ T","Kg","Kg",1],["Bịch đôi","Kg","Kg",1],["Băng keo giấy","Cái","Cái",1],["Băng keo trong","Cái","Cái",1],["Pin","Cặp","Cặp",1],["Nước rửa chén","Chai","Chai",1],["Nước lau nhà","Chai","Chai",1],["Giấy rút","Bịch","Bịch",1],["Ly S","Thùng","Cây",2],["Nắp ly S","Thùng","Cây",2],["Ly M","Thùng","Cây",2],["Ly L","Thùng","Cây",2],["Nắp ly M-L","Thùng","Cây",2]];
 var KHOG=["A · Sữa, siro, bột","B · Cà phê, bao bì, vệ sinh","C · Ly và nắp"];
-function showKho(k){touch();S.tab="home";S.mode="";hero(false);tabs(true);$("app").classList.remove("wide");if(!S.kho||S.kho.k!==k)S.kho={k:k,q:{},ly:"Dùng bình thường",anh:[],ghi:""};khoDraw();window.scrollTo(0,0)}
+function showKho(k){touch();S.tab="kho";S.mode="";hero(false);tabs(true);$("app").classList.remove("wide");if(!S.kho||S.kho.k!==k)S.kho={k:k,q:{},ly:"Dùng bình thường",anh:[],ghi:""};khoDraw();window.scrollTo(0,0)}
 function khoDraw(){var K=S.kho,nhap=K.k==="nhap";
 var h=back2()+'<h1 class="h">'+(nhap?"Nhập kho":"Xuất kho")+'</h1><p class="sub">'+(nhap?"Ghi khi nhận hàng. Chỉ bấm + ở dòng có nhận, số lượng tính theo đơn vị trong ngoặc.":"Ghi mỗi khi bóc seal. Chỉ bấm + ở dòng đã bóc, số lượng tính theo đơn vị trong ngoặc. Hàng hỏng hoặc đổ bỏ thì chọn lý do Hủy và gửi riêng một lần.")+'</p>';
 var g=-1;KHO.forEach(function(it,i){if(it[3]!==g){g=it[3];h+='<h2 class="s">'+KHOG[g]+'</h2>'}var q=K.q[i]||0;
@@ -643,6 +644,8 @@ if(r&&r.ok){sheet(false);S.kho=null;showDone(r)}else{toast((r&&r.msg)||"Chưa g�
 }).catch(function(){S.busy=false;if(b){b.disabled=false;b.textContent="Gửi"}toast("Chưa gửi được vì mất kết nối. Bấm Gửi lại.")})}
 document.addEventListener("change",function(e){var t=e.target;if(!t||!S.kho)return;if(t.id==="kly")S.kho.ly=t.value;else if(t.id==="kf1"||t.id==="kf2"){var f=t.files&&t.files[0];t.value="";khoAnh(f)}});
 document.addEventListener("input",function(e){var t=e.target;if(t&&t.id==="kghi"&&S.kho)S.kho.ghi=t.value});
+function showKhoHome(){touch();S.tab="kho";S.mode="";hero(false);tabs(true);$("app").classList.remove("wide");
+$("scr").innerHTML='<h1 class="h" style="margin-bottom:6px">Kho</h1><p class="sub">Ghi hàng nhập về quán và hàng bóc seal đem dùng.</p><button class="cta big" id="gokn" style="height:104px;flex-direction:column;gap:4px">Nhập kho<span style="font-size:14px;font-weight:500;opacity:.75">Khi nhận hàng về quán</span></button><button class="cta ghost" id="gokx" style="height:104px;margin-top:14px;flex-direction:column;gap:4px;font-size:22px">Xuất kho<span style="font-size:14px;font-weight:500;color:var(--dim)">Khi bóc seal hoặc hủy hàng</span></button>'}
 function extraClick(t){var q;
 if(t.closest("#gokn"))return showKho("nhap"),true;
 if(t.closest("#gokx"))return showKho("xuat"),true;
@@ -717,7 +720,7 @@ $("tabs").addEventListener("click",function(e){var b=e.target.closest("button[da
 $("sheet").addEventListener("click",function(e){var t=e.target;if(t.id==="sheet")sheet(false);else if(t.closest("#kcsend"))kcGui();else if(t.closest("#kcsua")||t.closest("#ksua"))sheet(false);else if(t.closest("#kgui"))khoGui()});
 [].forEach.call($("tabs").querySelectorAll("button[data-t]"),function(b){b.insertAdjacentHTML("afterbegin",IC[b.getAttribute("data-t")])});
 ribbon();setInterval(tick,1000);tick();boot();
-(function(){var n=$("tabs").querySelector(".in");n.innerHTML='<button data-t="home">'+IC.home+'Hôm nay</button><button data-t="lich">'+IC.lich+'Lịch<span class="bd" id="tbd" hidden></span></button><button data-t="ketca" class="fab" aria-label="Kết ca"><span class="fabc">'+IC.ketca+'Kết ca</span></button><button data-t="tui">'+IC.tui+'Tôi</button>'})();
+(function(){var n=$("tabs").querySelector(".in");n.innerHTML='<button data-t="home">'+IC.home+'Hôm nay</button><button data-t="lich">'+IC.lich+'Lịch<span class="bd" id="tbd" hidden></span></button><button data-t="ketca" class="fab" aria-label="Kết ca"><span class="fabc">'+IC.ketca+'Kết ca</span></button><button data-t="kho">'+IC.kho+'Kho</button><button data-t="tui">'+IC.tui+'Tôi</button>'})();
 </script>
 <script src="push.js"></script></body></html>
 
