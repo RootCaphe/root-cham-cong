@@ -364,15 +364,17 @@ el.innerHTML=h;var w=$("lw");if(w&&r.hom){var ix=days.findIndex(function(d){retu
 function lichDk(){var el=$("lbody");if(!el)return;S.dkx=0;el.innerHTML='<div class="load">Đang tải…</div>';
 gs("ccDangKyDoc",S.ten,S.pin).then(function(r){if(S.tab!=="lich"||S.lt!=="dk"||!$("lbody"))return;
 if(!r||!r.ok){toast((r&&r.msg)||"Không tải được đăng ký.");if(r&&r.khoa)showNames();else $("lbody").innerHTML='<p class="note">Không tải được đăng ký. Thử lại sau.</p>';return}
-S.dkd=r.dk;dkSyncMe();drawDk()}).catch(function(){if($("lbody"))$("lbody").innerHTML='<p class="note">Mất kết nối. Thử lại sau vài giây.</p>'})}
+S.dkd=r.dk;dkSim();dkSyncMe();drawDk()}).catch(function(){if($("lbody"))$("lbody").innerHTML='<p class="note">Mất kết nối. Thử lại sau vài giây.</p>'})}
 function dkSyncMe(){var d=S.dkd,f=null;(d.nv||[]).forEach(function(p){if(p.ten===S.ten)f=p.f});S.dkf=[];for(var i=0;i<28;i++)S.dkf.push(!!(f&&f[i]))}
-function dkOpen(){var d=S.dkd;return !!d&&!!d.daCo&&!!d.mo&&(Date.now()+S.lech)<d.han&&(Date.now()+S.lech)>=d.han-97200000}
+function nowDk(){return Date.now()+S.lech+(S.simDk||0)}
+function dkSim(){if(S.simDk!=null)return;var g=new URLSearchParams(location.search).get("gia"),d=S.dkd;if(!d||!d.han)return;S.simDk=0;var o=d.han-97200000,n=Date.now()+S.lech;if(g==="thu7")S.simDk=o+5000-n;else if(g==="truoc")S.simDk=o-10000-n;else if(g==="cuoi")S.simDk=d.han-60000-n}
+function dkOpen(){var d=S.dkd;return !!d&&!!d.daCo&&!!d.mo&&nowDk()<d.han&&nowDk()>=d.han-97200000}
 function dkCount(){var n=0,w=0;S.dkf.forEach(function(v,i){if(v){n++;if(i>=20)w++}});return{n:n,w:w}}
 function drawDk(){var d=S.dkd,el=$("lbody");if(!d||!el)return;
 if(!d.daCo){el.innerHTML='<p class="note" style="margin-top:18px">Chưa có bảng đăng ký cho tuần sau. Báo chủ quán mở bảng nhé.</p>';return}
-var days=d.ngay||[],names=[S.ten],open=dkOpen(),minCa=d.minCa||5,minCt=d.minCt||1,open0=d.han-97200000,pre=(Date.now()+S.lech)<open0;
+var days=d.ngay||[],names=[S.ten],open=dkOpen(),minCa=d.minCa||5,minCt=d.minCt||1,open0=d.han-97200000,pre=nowDk()<open0;
 var fm={};(d.nv||[]).forEach(function(p){fm[p.ten]=p.f});fm[S.ten]=S.dkf;
-var h='<p class="sub" style="margin-top:14px">Đăng ký tuần '+esc(days[0]?days[0].dm:"")+' – '+esc(days[6]?days[6].dm:"")+'. Chọn tất cả các ca bạn có thể làm. Đăng ký càng nhiều ca thì càng được ưu tiên xếp lịch. Bảng mở từ 12:00 Thứ bảy đến 15:00 Chủ nhật.</p>';
+var h=(S.simDk?'<p class="note" style="color:var(--late);margin:10px 0 0">CHẾ ĐỘ TEST: giờ đang giả lập. Lưu sẽ ghi thật vào bảng đăng ký.</p>':'')+'<p class="sub" style="margin-top:14px">Đăng ký tuần '+esc(days[0]?days[0].dm:"")+' – '+esc(days[6]?days[6].dm:"")+'. Chọn tất cả các ca bạn có thể làm. Đăng ký càng nhiều ca thì càng được ưu tiên xếp lịch. Bảng mở từ 12:00 Thứ bảy đến 15:00 Chủ nhật.</p>';
 if(pre){h+='<div class="blk" style="padding:12px 16px"><div class="t"><span style="color:var(--dim);font-size:14px">Mở đăng ký (Thứ bảy 12:00) sau</span><b id="dkcd" data-end="'+open0+'" style="font-size:17px"></b></div></div><p class="note">Chưa đến giờ đăng ký. Bảng sẽ tự mở lúc 12:00 Thứ bảy.</p>';el.innerHTML=h;dkTick();return}
 if(open)h+='<div class="blk" style="padding:12px 16px"><div class="t"><span style="color:var(--dim);font-size:14px">Đóng đăng ký (Chủ nhật 15:00) sau</span><b id="dkcd" data-end="'+d.han+'" style="font-size:17px"></b></div></div>';
 else h+='<div class="cta off" style="height:auto;min-height:56px;padding:12px 16px">Đã đóng đăng ký. Bạn không sửa được nữa.</div>';
@@ -402,7 +404,7 @@ gs("ccDangKyLuu",S.ten,S.pin,d.tu,S.dkf.map(function(v){return !!v})).then(funct
 if(r&&r.ok){toast(r.msg+(r.sub?". "+r.sub:""));if(r.dk){S.dkd=r.dk;dkSyncMe()}drawDk()}
 else{toast((r&&r.msg)||"Chưa lưu được.");if(r&&r.khoa)showNames();else if(/hạn/.test((r&&r.msg)||""))lichDk();else drawDk()}
 }).catch(function(){S.busy=false;toast("Chưa lưu được vì mất kết nối. Bấm Lưu lại.");var b2=$("dksave");if(b2){b2.disabled=false;b2.textContent="Lưu đăng ký"}})}
-function dkTick(){var e=$("dkcd");if(!e)return;var ms=+e.getAttribute("data-end")-(Date.now()+S.lech);
+function dkTick(){var e=$("dkcd");if(!e)return;var ms=+e.getAttribute("data-end")-nowDk();
 if(ms<=0){e.textContent="hết hạn";if(!S.dkx&&S.tab==="lich"&&S.lt==="dk"){S.dkx=1;lichDk()}return}
 var s=Math.floor(ms/1000),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);
 e.textContent=d>0?d+" ngày "+h+" giờ":p2(h)+":"+p2(m)+":"+p2(s%60)}
