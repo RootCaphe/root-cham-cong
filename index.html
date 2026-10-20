@@ -220,6 +220,17 @@ input[type=date].t{min-height:50px}
 #land .sch{table-layout:fixed;width:100%}
 #land .sch td{min-width:0;width:auto;height:30px}
 #land .sch th.nm1{width:78px;min-width:78px;max-width:78px}
+
+#goland{display:none!important}
+@media (orientation:landscape){#app.lw2{max-width:none}}
+#land .rot{padding:6px 12px}
+#land #lbody{flex:1;min-height:0;overflow:auto}
+#land .lh .seg2 button{padding:6px 14px}
+#land .wkn{margin-top:6px}
+#land .sub{margin:6px 0 !important;font-size:13px}
+#land .blk{margin-bottom:6px}
+.ltoast{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:var(--txt);color:var(--bg);padding:10px 14px;border-radius:12px;font-size:14px;font-weight:500;max-width:80%;opacity:0;pointer-events:none;transition:opacity .2s;z-index:5}
+.ltoast.on{opacity:1}
 </style></head>
 <body><div id="app">
 <header id="hd"><div class="brand">Root<span>Coffee</span></div><div id="ngay"></div></header>
@@ -246,7 +257,7 @@ function vn(){var t=new Date(Date.now()+S.lech+25200000);return{h:t.getUTCHours(
 function p2(n){return(n<10?"0":"")+n}
 function hm(min){return Math.floor(min/60)+":"+p2(min%60)}
 function initials(t){var p=String(t).trim().split(/\s+/);return (p.length>1?p[p.length-2].charAt(0)+p[p.length-1].charAt(0):p[0].slice(0,2)).toUpperCase()}
-function toast(m){var e=$("toast");e.textContent=m;e.className="on";clearTimeout(toast.t);toast.t=setTimeout(function(){e.className=""},4200)}
+function toast(m){if(landToast(m))return;var e=$("toast");e.textContent=m;e.className="on";clearTimeout(toast.t);toast.t=setTimeout(function(){e.className=""},4200)}
 function tick(){var n=vn();$("gio").textContent=p2(n.h)+":"+p2(n.m);$("giay").textContent=":"+p2(n.s);$("ngay").textContent=TH[n.w]+", "+p2(n.d)+"/"+p2(n.mo);
  var mi=n.h*60+n.m+n.s/60,pc=Math.min(100,Math.max(0,(mi-330)/960*100));$("mark").style.left=pc+"%";$("mark").style.display=(mi<330||mi>1290)?"none":"block";
  var cs=document.getElementsByClassName("cd");for(var i=0;i<cs.length;i++){var ms=+cs[i].getAttribute("data-end")-Date.now();cs[i].textContent=ms<=0?"đang xử lý…":Math.floor(ms/60000)+":"+p2(Math.floor(ms/1000)%60)}
@@ -275,7 +286,7 @@ function login(){S.busy=true;gs("ccDangNhapPin",S.pin).then(function(r){S.busy=f
   else{S.pin="";var d=$("dots");if(d){d.className="dots shake";setTimeout(function(){dots();d.className="dots"},420)}$("pmsg").textContent=r.msg||"PIN chưa đúng."}
  }).catch(function(){S.busy=false;S.pin="";dots();$("pmsg").textContent="Mất kết nối. Thử lại sau vài giây."})}
 
-function go(t){clearTimeout(S.doneT);S.tab=t;S.mode="";S.busy=false;sheet(false);$("app").classList.remove("wide");
+function go(t){closeLand();$("app").classList.remove("lw2");clearTimeout(S.doneT);S.tab=t;S.mode="";S.busy=false;sheet(false);$("app").classList.remove("wide");
  if(t==="lich")showLich();else if(t==="ketca")showKc();else if(t==="tui")showTui();else showHome()}
 var IC={
  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
@@ -312,9 +323,12 @@ gs("ccXinPhepKhac",S.ten,S.pin,$("xpl").value,ng,+$("xpc").value,ly).then(functi
 if(r&&r.ok){showDone(r)}else{toast((r&&r.msg)||"Chưa gửi được.");if(r&&r.khoa)showNames();else{b.disabled=false;b.textContent="Gửi xin phép"}}
 }).catch(function(){S.busy=false;b.disabled=false;b.textContent="Gửi xin phép";toast("Chưa gửi được vì mất kết nối. Bấm Gửi lại.")})}
 
-function showLich(){S.tab="lich";S.mode="";hero(false);touch();tabs(true);S.lt=S.lt||"tuan";
-var h='<div class="seg2" role="tablist">'+[["tuan","Tuần này"],["dk","Đăng ký"],["cua","Của tôi"]].map(function(x){return'<button data-lt="'+x[0]+'" class="'+(S.lt===x[0]?"on":"")+'">'+x[1]+'</button>'}).join("")+'</div><div id="lbody"></div>';
-$("scr").innerHTML=h;if(S.lt==="tuan")lichTuan();else if(S.lt==="dk")lichDk();else lichCua()}
+function showLich(){S.tab="lich";S.mode="";hero(false);touch();tabs(true);S.lt=S.lt||"tuan";S.po=window.innerHeight>=window.innerWidth;
+var tb=[["tuan","Tuần này"],["dk","Đăng ký"],["cua","Của tôi"]].map(function(x){return'<button data-lt="'+x[0]+'" class="'+(S.lt===x[0]?"on":"")+'">'+x[1]+'</button>'}).join("");
+if(S.lt!=="cua"&&S.po){$("app").classList.remove("lw2");$("scr").innerHTML="";landShow(tb);if(S.lt==="tuan")lichTuan();else lichDk();return}
+closeLand();$("app").classList.toggle("lw2",S.lt!=="cua");
+$("scr").innerHTML='<div class="seg2" role="tablist">'+tb+'</div><div id="lbody"></div>';
+if(S.lt==="tuan")lichTuan();else if(S.lt==="dk")lichDk();else lichCua()}
 function colOf(names,n){var i=names.indexOf(n);return PAL[(i<0?0:i)%PAL.length]}
 function tblLich(days,names,grid,can,o){
 var h='<div class="lw" id="lw"><table class="sch"><tr><th class="nm1" rowspan="2">Tên</th>';
@@ -369,6 +383,10 @@ el.innerHTML='<div class="rot'+(rot?"":" flat")+'"><div class="lh"><b>'+esc(t)+'
 el.querySelector(".rot").appendChild(c);document.body.appendChild(el)}
 function closeLand(){var e=$("land");if(e)e.remove()}
 document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest("#landx"))closeLand()});
+function landShow(tb){var e=$("land");if(!e){e=document.createElement("div");e.id="land";document.body.appendChild(e);e.addEventListener("click",function(ev){if(ev.target.closest("#landx")){go("home");return}extraClick(ev.target)})}
+e.innerHTML='<div class="rot"><div class="lh"><div class="seg2" style="margin:0">'+tb+'</div><button class="out" id="landx" style="color:var(--crema);font-weight:600">Thoát</button></div><div id="lbody"></div></div>'}
+function landToast(m){var l=$("land");if(!l)return false;var r=l.querySelector(".rot");if(!r)return false;var t=r.querySelector(".ltoast");if(!t){t=document.createElement("div");t.className="ltoast";r.appendChild(t)}t.textContent=m;t.classList.add("on");clearTimeout(landToast.t);landToast.t=setTimeout(function(){t.classList.remove("on")},4200);return true}
+window.addEventListener("resize",function(){var p=window.innerHeight>=window.innerWidth;if(p!==S.po&&S.tab==="lich"&&!S.mode&&!S.busy&&S.st&&S.lt!=="cua"){showLich()}});
 function dkToggle(i){if(!dkOpen()){toast("Đã đóng đăng ký.");return}S.dkf[i]=!S.dkf[i];var w=$("lw"),x=w?w.scrollLeft:0;drawDk();w=$("lw");if(w)w.scrollLeft=x}
 function dkSave(){if(S.busy)return;var d=S.dkd;if(!dkOpen()){toast("Đã đóng đăng ký.");return drawDk()}var c=dkCount(),minCa=d.minCa||5,minCt=d.minCt||1;
 if(c.n<minCa){toast("Chọn ít nhất "+minCa+" ca. Bạn mới chọn "+c.n+".");return}
