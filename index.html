@@ -714,7 +714,7 @@ $("scr").addEventListener("click",function(e){var t=e.target,q;
 $("scr").addEventListener("keydown",function(e){if(e.key==="Enter"){var q=e.target.closest&&e.target.closest("li[data-i]");if(q)showPin(+q.getAttribute("data-i"))}});
 document.addEventListener("visibilitychange",function(){if(document.hidden)stopCam()});
 $("tabs").addEventListener("click",function(e){var b=e.target.closest("button[data-t]");if(b&&S.st)go(b.getAttribute("data-t"))});
-$("sheet").addEventListener("click",function(e){var t=e.target;if(t.id==="sheet")sheet(false);else if(t.closest("#kcsend"))kcGui();else if(t.closest("#kcsua"))sheet(false)});
+$("sheet").addEventListener("click",function(e){var t=e.target;if(t.id==="sheet")sheet(false);else if(t.closest("#kcsend"))kcGui();else if(t.closest("#kcsua")||t.closest("#ksua"))sheet(false);else if(t.closest("#kgui"))khoGui()});
 [].forEach.call($("tabs").querySelectorAll("button[data-t]"),function(b){b.insertAdjacentHTML("afterbegin",IC[b.getAttribute("data-t")])});
 ribbon();setInterval(tick,1000);tick();boot();
 (function(){var n=$("tabs").querySelector(".in");n.innerHTML='<button data-t="home">'+IC.home+'Hôm nay</button><button data-t="lich">'+IC.lich+'Lịch<span class="bd" id="tbd" hidden></span></button><button data-t="ketca" class="fab" aria-label="Kết ca"><span class="fabc">'+IC.ketca+'Kết ca</span></button><button data-t="tui">'+IC.tui+'Tôi</button>'})();
