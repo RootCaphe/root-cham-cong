@@ -211,6 +211,15 @@ input[type=date].t{min-height:50px}
 .sch tr.me td.e.p0,.sch tr.me td.e.p1{outline:0}
 .sch tr.me td{border-top:1px solid rgba(235,178,78,.8);border-bottom:1px solid rgba(235,178,78,.8)}
 .sch tr.ft td{height:26px}
+
+#land{position:fixed;inset:0;z-index:30;background:var(--bg);overflow:hidden}
+#land .rot{position:absolute;top:0;left:100vw;width:100vh;width:100dvh;height:100vw;transform-origin:top left;transform:rotate(90deg);padding:8px 12px;display:flex;flex-direction:column}
+#land .rot.flat{left:0;width:100vw;height:100vh;transform:none}
+#land .lh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;font-size:15px}
+#land .lw{margin:0;padding:0;overflow:auto;flex:1}
+#land .sch{table-layout:fixed;width:100%}
+#land .sch td{min-width:0;width:auto;height:30px}
+#land .sch th.nm1{width:78px;min-width:78px;max-width:78px}
 </style></head>
 <body><div id="app">
 <header id="hd"><div class="brand">Root<span>Coffee</span></div><div id="ngay"></div></header>
@@ -253,7 +262,7 @@ function tabs(on){var n=$("tabs"),show=!!on&&!!S.st&&!S.qlMode;n.hidden=!show;$(
  if(show){[].forEach.call(n.querySelectorAll("button"),function(b){b.classList.toggle("on",b.getAttribute("data-t")===S.tab)});
   var c=S.st&&S.st.doica?S.st.doica.filter(function(q){return q.choToi}).length:0,bd=$("tbd");bd.textContent=c||"";bd.hidden=!c}}
 function sheet(on,h){var s=$("sheet");if(on){s.innerHTML='<div class="sh"><div class="gr"></div>'+h+'</div>';s.className="on"}else{s.className="";s.innerHTML=""}}
-function showNames(){S.ten="";S.pin="";S.st=null;S.anh=null;S.mode="";S.ql=null;S.edit=-1;S.xanh=null;S.xly="";S.xkey="";S.qlMode=false;S.kc=null;S.lt="tuan";S.lw="";S.lc=null;S.dkd=null;S.dkf=null;S.tab="home";$("app").classList.remove("wide");stopCam();clearTimeout(S.doneT);ribbon();hero(false);tabs(false);sheet(false);
+function showNames(){S.ten="";S.pin="";S.st=null;S.anh=null;S.mode="";S.ql=null;S.edit=-1;S.xanh=null;S.xly="";S.xkey="";S.qlMode=false;S.kc=null;S.lt="tuan";S.lw="";S.lc=null;S.dkd=null;S.dkf=null;closeLand();S.tab="home";$("app").classList.remove("wide");stopCam();clearTimeout(S.doneT);ribbon();hero(false);tabs(false);sheet(false);
  var keys="";[1,2,3,4,5,6,7,8,9].forEach(function(k){keys+='<button data-k="'+k+'">'+k+'</button>'});
  keys+='<button class="ghost" disabled></button><button data-k="0">0</button><button class="ghost" data-k="del" aria-label="Xóa số">'+ICO_DEL+'</button>';
  $("scr").innerHTML='<div class="lg"><div class="lgm">R</div><h1 class="h" style="text-align:center">Nhập mã PIN</h1><p class="sub" style="text-align:center">Mã 4 số của bạn. Dùng để chấm công, kết ca và nhập kho.</p><div class="dots" id="dots"><i></i><i></i><i></i><i></i></div><div id="pmsg"></div><div class="pad">'+keys+'</div></div>';
@@ -330,7 +339,7 @@ function drawTuan(){var r=S.lc,el=$("lbody");if(!r||!el)return;var days=r.ngay||
 var grid=r.coChot?function(n){return r.chot&&r.chot[n]}:function(n){return r.dk&&r.dk[n]};
 var h='<div class="wkn"><button data-lw="-1" aria-label="Tuần trước">‹</button><b>Tuần '+esc(days[0]?days[0].dm:"")+' – '+esc(days[6]?days[6].dm:"")+'</b><button data-lw="1" aria-label="Tuần sau">›</button></div>';
 if(!r.coChot)h+='<p class="note" style="margin-top:8px">Tuần này chưa chốt lịch. Bảng đang hiện ca mọi người đã đăng ký.</p>';
-h+=tblLich(days,names,grid,r.can,{hom:r.hom,cnt:r.coChot?"Đã xếp":"Đã đăng ký"});
+h+='<button class="cta ghost sm2" id="goland" style="margin-top:10px">Xem bảng ngang</button>';h+=tblLich(days,names,grid,r.can,{hom:r.hom,cnt:r.coChot?"Đã xếp":"Đã đăng ký"});
 h+='<p class="sm">Ca 1: 5:30–9:30 · Ca 2: 9:30–13:30 · Ca 3: 13:30–17:30 · Ca 4: 17:30–21:30. Dòng của bạn nổi bật, ngày hôm nay màu vàng. Dòng Cần so với số người đã có: đỏ là còn thiếu.</p>';
 el.innerHTML=h;var w=$("lw");if(w&&r.hom){var ix=days.findIndex(function(d){return d.iso===r.hom});if(ix>0)w.scrollLeft=Math.max(0,ix*4*21-10)}}
 function lichDk(){var el=$("lbody");if(!el)return;S.dkx=0;el.innerHTML='<div class="load">Đang tải…</div>';
@@ -347,12 +356,19 @@ var fm={};(d.nv||[]).forEach(function(p){fm[p.ten]=p.f});fm[S.ten]=S.dkf;
 var h='<p class="sub" style="margin-top:14px">Đăng ký tuần '+esc(days[0]?days[0].dm:"")+' – '+esc(days[6]?days[6].dm:"")+'. Chọn tất cả các ca bạn có thể làm. Đăng ký càng nhiều ca thì càng được ưu tiên xếp lịch.</p>';
 if(open)h+='<div class="blk" style="padding:12px 16px"><div class="t"><span style="color:var(--dim);font-size:14px">Đóng đăng ký (Chủ nhật 15:00) sau</span><b id="dkcd" data-end="'+d.han+'" style="font-size:17px"></b></div></div>';
 else h+='<div class="cta off" style="height:auto;min-height:56px;padding:12px 16px">Đã đóng đăng ký. Bạn không sửa được nữa.</div>';
-h+=tblLich(days,names,function(n){return fm[n]},d.can,{hom:"",edit:open,cnt:"Đã đăng ký"});
+h+='<button class="cta ghost sm2" id="goland" style="margin-top:10px">Xem bảng ngang</button>';h+=tblLich(days,names,function(n){return fm[n]},d.can,{hom:"",edit:open,cnt:"Đã đăng ký"});
 var c=dkCount(),okN=c.n>=minCa,okW=c.w>=minCt;
 h+='<div class="tot" style="margin-top:14px"><span>Bạn đã chọn</span><b>'+c.n+' ca</b></div>';
 h+='<p class="sm" style="color:'+(okN&&okW?"var(--ok)":"var(--late)")+'">Cần tối thiểu '+minCa+' ca và có ít nhất '+minCt+' ca Thứ bảy hoặc Chủ nhật.</p>';
 if(open)h+='<button class="cta" id="dksave">Lưu đăng ký</button>';
 el.innerHTML=h;dkTick()}
+function openLand(){var w=$("lw");if(!w)return;closeLand();var src=S.lt==="dk"?S.dkd:S.lc,dd=(src&&src.ngay)||[];var t="Lịch tuần "+(dd[0]?dd[0].dm:"")+" – "+(dd[6]?dd[6].dm:"")+(S.lt==="dk"?" (đăng ký)":"");
+var c=w.cloneNode(true);c.removeAttribute("id");[].forEach.call(c.querySelectorAll("[data-cell]"),function(x){x.removeAttribute("data-cell");x.classList.remove("mine")});
+var rot=window.innerHeight>=window.innerWidth,el=document.createElement("div");el.id="land";
+el.innerHTML='<div class="rot'+(rot?"":" flat")+'"><div class="lh"><b>'+esc(t)+'</b><button class="out" id="landx" style="color:var(--crema);font-weight:600">Đóng</button></div></div>';
+el.querySelector(".rot").appendChild(c);document.body.appendChild(el)}
+function closeLand(){var e=$("land");if(e)e.remove()}
+document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest("#landx"))closeLand()});
 function dkToggle(i){if(!dkOpen()){toast("Đã đóng đăng ký.");return}S.dkf[i]=!S.dkf[i];var w=$("lw"),x=w?w.scrollLeft:0;drawDk();w=$("lw");if(w)w.scrollLeft=x}
 function dkSave(){if(S.busy)return;var d=S.dkd;if(!dkOpen()){toast("Đã đóng đăng ký.");return drawDk()}var c=dkCount(),minCa=d.minCa||5,minCt=d.minCt||1;
 if(c.n<minCa){toast("Chọn ít nhất "+minCa+" ca. Bạn mới chọn "+c.n+".");return}
@@ -517,6 +533,7 @@ function extraClick(t){var q;
  if(t.closest("#kcrev"))return kcXem(),true;
  if(t.closest("#goxin"))return showXin(),true;
 if(t.closest("#goxp"))return showXp(),true;
+if(t.closest("#goland"))return openLand(),true;
 if(t.closest("#xpgui"))return xpGui(),true;
 if((q=t.closest("[data-lt]"))){S.lt=q.getAttribute("data-lt");return showLich(),true}
 if((q=t.closest("[data-lw]"))){S.lw=addDays(S.lw||(S.lc&&S.lc.tu)||isoHom(),7*(+q.getAttribute("data-lw")));lichTuan();return true}
