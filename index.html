@@ -366,13 +366,14 @@ gs("ccDangKyDoc",S.ten,S.pin).then(function(r){if(S.tab!=="lich"||S.lt!=="dk"||!
 if(!r||!r.ok){toast((r&&r.msg)||"Không tải được đăng ký.");if(r&&r.khoa)showNames();else $("lbody").innerHTML='<p class="note">Không tải được đăng ký. Thử lại sau.</p>';return}
 S.dkd=r.dk;dkSyncMe();drawDk()}).catch(function(){if($("lbody"))$("lbody").innerHTML='<p class="note">Mất kết nối. Thử lại sau vài giây.</p>'})}
 function dkSyncMe(){var d=S.dkd,f=null;(d.nv||[]).forEach(function(p){if(p.ten===S.ten)f=p.f});S.dkf=[];for(var i=0;i<28;i++)S.dkf.push(!!(f&&f[i]))}
-function dkOpen(){var d=S.dkd;return !!d&&!!d.daCo&&!!d.mo&&(Date.now()+S.lech)<d.han}
+function dkOpen(){var d=S.dkd;return !!d&&!!d.daCo&&!!d.mo&&(Date.now()+S.lech)<d.han&&(Date.now()+S.lech)>=d.han-97200000}
 function dkCount(){var n=0,w=0;S.dkf.forEach(function(v,i){if(v){n++;if(i>=20)w++}});return{n:n,w:w}}
 function drawDk(){var d=S.dkd,el=$("lbody");if(!d||!el)return;
 if(!d.daCo){el.innerHTML='<p class="note" style="margin-top:18px">Chưa có bảng đăng ký cho tuần sau. Báo chủ quán mở bảng nhé.</p>';return}
-var days=d.ngay||[],names=(d.nv||[]).map(function(p){return p.ten}),open=dkOpen(),minCa=d.minCa||5,minCt=d.minCt||1;
+var days=d.ngay||[],names=[S.ten],open=dkOpen(),minCa=d.minCa||5,minCt=d.minCt||1,open0=d.han-97200000,pre=(Date.now()+S.lech)<open0;
 var fm={};(d.nv||[]).forEach(function(p){fm[p.ten]=p.f});fm[S.ten]=S.dkf;
-var h='<p class="sub" style="margin-top:14px">Đăng ký tuần '+esc(days[0]?days[0].dm:"")+' – '+esc(days[6]?days[6].dm:"")+'. Chọn tất cả các ca bạn có thể làm. Đăng ký càng nhiều ca thì càng được ưu tiên xếp lịch.</p>';
+var h='<p class="sub" style="margin-top:14px">Đăng ký tuần '+esc(days[0]?days[0].dm:"")+' – '+esc(days[6]?days[6].dm:"")+'. Chọn tất cả các ca bạn có thể làm. Đăng ký càng nhiều ca thì càng được ưu tiên xếp lịch. Bảng mở từ 12:00 Thứ bảy đến 15:00 Chủ nhật.</p>';
+if(pre){h+='<div class="blk" style="padding:12px 16px"><div class="t"><span style="color:var(--dim);font-size:14px">Mở đăng ký (Thứ bảy 12:00) sau</span><b id="dkcd" data-end="'+open0+'" style="font-size:17px"></b></div></div><p class="note">Chưa đến giờ đăng ký. Bảng sẽ tự mở lúc 12:00 Thứ bảy.</p>';el.innerHTML=h;dkTick();return}
 if(open)h+='<div class="blk" style="padding:12px 16px"><div class="t"><span style="color:var(--dim);font-size:14px">Đóng đăng ký (Chủ nhật 15:00) sau</span><b id="dkcd" data-end="'+d.han+'" style="font-size:17px"></b></div></div>';
 else h+='<div class="cta off" style="height:auto;min-height:56px;padding:12px 16px">Đã đóng đăng ký. Bạn không sửa được nữa.</div>';
 h+='<button class="cta ghost sm2" id="goland" style="margin-top:10px">Xem bảng ngang</button>';h+=tblLich(days,names,function(n){return fm[n]},d.can,{hom:"",edit:open,cnt:"Đã đăng ký"});
@@ -380,7 +381,7 @@ var c=dkCount(),okN=c.n>=minCa,okW=c.w>=minCt;
 h+='<div class="tot" style="margin-top:14px"><span>Bạn đã chọn</span><b>'+c.n+' ca</b></div>';
 h+='<p class="sm" style="color:'+(okN&&okW?"var(--ok)":"var(--late)")+'">Cần tối thiểu '+minCa+' ca và có ít nhất '+minCt+' ca Thứ bảy hoặc Chủ nhật.</p>';
 if(open)h+='<button class="cta" id="dksave">Lưu đăng ký</button>';
-el.innerHTML=h;dkTick()}
+el.innerHTML=h;[].forEach.call(el.querySelectorAll("tr.ft"),function(r){r.remove()});dkTick()}
 function openLand(){var w=$("lw");if(!w)return;closeLand();var src=S.lt==="dk"?S.dkd:S.lc,dd=(src&&src.ngay)||[];var t="Lịch tuần "+(dd[0]?dd[0].dm:"")+" – "+(dd[6]?dd[6].dm:"")+(S.lt==="dk"?" (đăng ký)":"");
 var c=w.cloneNode(true);c.removeAttribute("id");[].forEach.call(c.querySelectorAll("[data-cell]"),function(x){x.removeAttribute("data-cell");x.classList.remove("mine")});
 var rot=window.innerHeight>=window.innerWidth,el=document.createElement("div");el.id="land";
