@@ -180,8 +180,8 @@ input[type=date].t{min-height:50px}
 .sch th.dh small{display:block;font-weight:400;color:var(--dim);font-size:10px}
 .sch th.ch{font-weight:500;color:var(--dim);font-size:10px;height:18px;background:var(--bg2)}
 .sch th.nm1{position:sticky;left:0;z-index:2;background:var(--bg);text-align:left;padding:0 8px;min-width:84px;max-width:84px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;font-size:12px;border-left:1px solid var(--line)}
-.sch tr.me th.nm1{color:var(--crema);font-weight:700;background:#26361f}
-.sch tr.me td.e{background:rgba(235,178,78,.1)}
+.sch tr.myrow th.nm1{color:var(--crema);font-weight:700;background:#26361f}
+.sch tr.myrow td.e{background:rgba(235,178,78,.1)}
 .sch th.dh.tdy{background:var(--crema);color:var(--crema-ink)}
 .sch th.dh.tdy small{color:var(--crema-ink)}
 .sch td.e.tdy{background:rgba(235,178,78,.16)}
@@ -208,8 +208,8 @@ input[type=date].t{min-height:50px}
 .sch td.on{box-shadow:inset 0 0 0 1px rgba(14,38,33,.45)}
 .sch th.dh.tdy{background:var(--crema);color:var(--crema-ink)}
 .sch td.e.tdy.p0,.sch td.e.tdy.p1{background:rgba(235,178,78,.3)}
-.sch tr.me td.e.p0,.sch tr.me td.e.p1{outline:0}
-.sch tr.me td{border-top:1px solid rgba(235,178,78,.8);border-bottom:1px solid rgba(235,178,78,.8)}
+.sch tr.myrow td.e.p0,.sch tr.myrow td.e.p1{outline:0}
+.sch tr.myrow td{border-top:1px solid rgba(235,178,78,.8);border-bottom:1px solid rgba(235,178,78,.8)}
 .sch tr.ft td{height:26px}
 
 #land{position:fixed;inset:0;z-index:30;background:var(--bg);overflow:hidden}
@@ -231,6 +231,11 @@ input[type=date].t{min-height:50px}
 #land .blk{margin-bottom:6px}
 .ltoast{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:var(--txt);color:var(--bg);padding:10px 14px;border-radius:12px;font-size:14px;font-weight:500;max-width:80%;opacity:0;pointer-events:none;transition:opacity .2s;z-index:5}
 .ltoast.on{opacity:1}
+
+#land .rot{left:var(--W,100vw);width:var(--H,100dvh);height:var(--W,100vw)}
+#land .sch td{height:25px}
+#land .sch tr.ft td{height:22px}
+#land .sch th.dh{padding:3px 0}
 </style></head>
 <body><div id="app">
 <header id="hd"><div class="brand">Root<span>Coffee</span></div><div id="ngay"></div></header>
@@ -337,7 +342,7 @@ h+='</tr><tr>';
 days.forEach(function(d,di){for(var c=1;c<=4;c++)h+='<th class="ch c'+c+(c===4?" dg":"")+'">'+c+'</th>'});
 h+='</tr>';
 names.forEach(function(n){var me=n===S.ten,g=grid(n)||[],col=colOf(names,n),ed=o.edit&&me;
-h+='<tr'+(me?' class="me"':'')+'><th class="nm1">'+esc(n)+'</th>';
+h+='<tr'+(me?' class="myrow"':'')+'><th class="nm1">'+esc(n)+'</th>';
 for(var i=0;i<28;i++){var on=!!g[i],d=days[Math.floor(i/4)]||{},cl=(on?"on":"e")+" p"+(Math.floor(i/4)%2);if(d.iso&&d.iso===o.hom)cl+=" tdy";if(i%4===3)cl+=" dg";if(ed)cl+=" mine";
 h+='<td class="'+cl+'"'+(on?' style="background:'+col+'"':'')+(ed?' data-cell="'+i+'"':'')+'>'+(on&&ed?'<span style="color:#2B1B06;font-weight:700">✓</span>':'')+'</td>'}
 h+='</tr>'});
@@ -384,9 +389,9 @@ el.querySelector(".rot").appendChild(c);document.body.appendChild(el)}
 function closeLand(){var e=$("land");if(e)e.remove()}
 document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest("#landx"))closeLand()});
 function landShow(tb){var e=$("land");if(!e){e=document.createElement("div");e.id="land";document.body.appendChild(e);e.addEventListener("click",function(ev){if(ev.target.closest("#landx")){go("home");return}extraClick(ev.target)})}
-e.innerHTML='<div class="rot"><div class="lh"><div class="seg2" style="margin:0">'+tb+'</div><button class="out" id="landx" style="color:var(--crema);font-weight:600">Thoát</button></div><div id="lbody"></div></div>'}
+e.style.setProperty("--W",innerWidth+"px");e.style.setProperty("--H",innerHeight+"px");e.innerHTML='<div class="rot"><div class="lh"><div class="seg2" style="margin:0">'+tb+'</div><button class="out" id="landx" style="color:var(--crema);font-weight:600">Thoát</button></div><div id="lbody"></div></div>'}
 function landToast(m){var l=$("land");if(!l)return false;var r=l.querySelector(".rot");if(!r)return false;var t=r.querySelector(".ltoast");if(!t){t=document.createElement("div");t.className="ltoast";r.appendChild(t)}t.textContent=m;t.classList.add("on");clearTimeout(landToast.t);landToast.t=setTimeout(function(){t.classList.remove("on")},4200);return true}
-window.addEventListener("resize",function(){var p=window.innerHeight>=window.innerWidth;if(p!==S.po&&S.tab==="lich"&&!S.mode&&!S.busy&&S.st&&S.lt!=="cua"){showLich()}});
+window.addEventListener("resize",function(){var lx=$("land");if(lx){lx.style.setProperty("--W",innerWidth+"px");lx.style.setProperty("--H",innerHeight+"px")}var p=window.innerHeight>=window.innerWidth;if(p!==S.po&&S.tab==="lich"&&!S.mode&&!S.busy&&S.st&&S.lt!=="cua"){showLich()}});
 function dkToggle(i){if(!dkOpen()){toast("Đã đóng đăng ký.");return}S.dkf[i]=!S.dkf[i];var w=$("lw"),x=w?w.scrollLeft:0;drawDk();w=$("lw");if(w)w.scrollLeft=x}
 function dkSave(){if(S.busy)return;var d=S.dkd;if(!dkOpen()){toast("Đã đóng đăng ký.");return drawDk()}var c=dkCount(),minCa=d.minCa||5,minCt=d.minCt||1;
 if(c.n<minCa){toast("Chọn ít nhất "+minCa+" ca. Bạn mới chọn "+c.n+".");return}
