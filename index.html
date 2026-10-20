@@ -541,7 +541,7 @@ function showQl(){var q=S.ql;S.mode="ql";S.qlMode=true;touch();ribbon();hero(fal
  if(!cd)h+='<p class="note" style="text-align:left;margin-top:0">Không có mục nào đang chờ.</p>';
  q.choDoi.forEach(function(x){h+='<div class="blk"><div style="font-size:16px;font-weight:600;line-height:1.4">'+esc(x.mo)+'</div><div class="sm">Đổi ca · tự duyệt sau <span class="cd" data-end="'+(now+x.conLai*1000)+'"></span></div><div class="two" style="margin-top:12px"><button class="cta sm2" data-dy="'+esc(x.id)+'">Duyệt</button><button class="cta ghost sm2" data-dn="'+esc(x.id)+'">Không duyệt</button></div></div>'});
  q.choTc.forEach(function(x){h+='<div class="blk"><div style="font-size:16px;font-weight:600;line-height:1.4">'+esc(x.ten)+(x.loai==="Sớm"?" vào sớm ":" tan muộn ")+x.phut+' phút</div><div class="sm">Tăng ca · '+esc(x.ngay)+', '+esc(x.tu)+' đến '+esc(x.den)+' · nếu duyệt đủ ≈ '+fmtD(x.uoc)+'</div>'+(x.anh?'<a class="lk" href="'+esc(x.anh)+'" target="_blank" rel="noopener">Xem ảnh</a>':'')+'<label class="lb" style="margin-top:10px" for="p'+esc(x.id)+'">Số phút tính tăng ca</label><input class="t" type="number" inputmode="numeric" min="1" max="'+x.phut+'" id="p'+esc(x.id)+'" value="'+x.phut+'"><div class="two" style="margin-top:12px"><button class="cta sm2" data-ty="'+esc(x.id)+'">Duyệt tăng ca</button><button class="cta ghost sm2" data-tn="'+esc(x.id)+'">Không tính</button></div></div>'});
- h+='<h2 class="s">Hôm nay</h2>';
+ h+='<div id="xep"></div>';h+='<h2 class="s">Hôm nay</h2>';
  if(!q.hom.length)h+='<p class="note" style="text-align:left;margin-top:0">Hôm nay chưa có lịch.</p>';
  else h+='<div class="tbl" style="border-top:1px solid var(--line)">'+q.hom.map(function(b){return'<div class="hn" style="display:grid;grid-template-columns:1.2fr 1fr auto">'+'<span><b>'+esc(b.ten)+'</b><small>'+esc(b.nhan)+(b.gio?" · "+esc(b.gio):"")+'</small></span><span>'+(b.vao?esc(b.vao)+" – "+esc(b.ra||"…"):"–")+(b.xin?'<small>xin trễ '+b.xin+'p</small>':'')+'</span>'+chip(b.tt,b.tre)+'</div>'}).join("")+'</div>';
  if(q.xin.length){h+='<h2 class="s">Xin đi trễ gần đây</h2>'+q.xin.map(function(x){return'<div class="hn"><span><b>'+esc(x.ten)+'</b> · '+x.phut+' phút<small>'+esc(x.ngay+" · "+x.ca)+'</small></span><span>'+esc(x.lyDo)+(x.anh?' <a class="lk" href="'+esc(x.anh)+'" target="_blank" rel="noopener">Ảnh</a>':'')+'</span><button class="out" data-hx="'+esc(x.id)+'">Hủy</button></div>'}).join("")}
@@ -552,8 +552,36 @@ function showQl(){var q=S.ql;S.mode="ql";S.qlMode=true;touch();ribbon();hero(fal
  h+='<h2 class="s">Sửa chấm công</h2>';
  q.dong.forEach(function(d,i){if(S.edit===i){h+='<div class="blk"><b style="font-size:16px">'+esc(d.ten)+'</b><span class="g">'+esc(d.ngay+" · "+d.ca)+'</span><div class="two" style="margin-top:10px"><div><label class="lb" style="margin-top:0" for="ev">Vào</label><input class="t" id="ev" inputmode="numeric" placeholder="09:30" value="'+esc(d.vao)+'"></div><div><label class="lb" style="margin-top:0" for="er">Ra</label><input class="t" id="er" inputmode="numeric" placeholder="13:30" value="'+esc(d.ra)+'"></div></div><label class="lb" for="et">Trạng thái</label><select id="et">'+TTS.map(function(t){return'<option value="'+esc(t)+'">'+esc(t||"Tự tính theo giờ vào")+'</option>'}).join("")+'</select><label class="lb" for="eg">Ghi chú</label><input class="t" id="eg" maxlength="100"><div class="two" style="margin-top:12px"><button class="cta sm2" data-el="'+i+'">Lưu</button><button class="cta ghost sm2" data-ed="1">Đóng</button></div></div>'}
   else h+='<div class="hn"><span><b>'+esc(d.ten)+'</b><small>'+esc(d.ngay+" · "+d.ca)+'</small></span><span>'+(d.vao?esc(d.vao)+" – "+esc(d.ra||"…"):"–")+'</span><span style="display:flex;gap:8px;align-items:center">'+chip(d.tt,0)+'<button class="out" data-se="'+i+'">Sửa</button></span></div>'});
- $("scr").innerHTML=h}
+ $("scr").innerHTML=h;xepLoad()}
+function xepLoad(){var el=$("xep");if(!el)return;if(S.xep)xepDraw();gs("ccQuanLyXep",S.pin).then(function(r){if(!r||!r.ok||S.mode!=="ql")return;S.xep=r.xep;xepDraw()}).catch(function(){})}
+function xepDraw(){var el=$("xep"),x=S.xep;if(!el)return;if(!x){el.innerHTML="";return}
+var nhap=x.trang==="nháp",days=x.ngay,dk={};x.dk.forEach(function(p){dk[p.ten]=p.f});
+var h='<h2 class="s">Lịch tuần '+esc(days[0].dm)+' – '+esc(days[6].dm)+(nhap?' (nháp)':' (đã duyệt)')+'</h2>';
+if(nhap)h+='<p class="sub" style="margin-top:0;font-size:14px">Hệ thống đã tự xếp theo đăng ký. Chạm vào ô để thêm hoặc bớt ca (ô có chấm mờ là ca nhân viên đã đăng ký). Xong bấm Duyệt để chốt lịch và báo cho nhân viên.</p>';
+if(x.thieu.length)h+='<div class="blk" style="padding:12px 16px"><b style="font-size:15px;color:var(--late)">Cần xem lại</b>'+x.thieu.map(function(s){return'<div class="sm">'+esc(s)+'</div>'}).join("")+'</div>';
+h+='<div class="lw" id="xlw"><table class="sch"><tr><th class="nm1" rowspan="2">Tên</th>';
+days.forEach(function(d,di){h+='<th colspan="4" class="dh dg p'+(di%2)+'">'+esc(thuNgan(d.thu))+'<small>'+esc(d.dm)+'</small></th>'});
+h+='</tr><tr>';days.forEach(function(d){for(var c=1;c<=4;c++)h+='<th class="ch c'+c+(c===4?" dg":"")+'">'+c+'</th>'});h+='</tr>';
+var names=x.nv.map(function(p){return p.ten});
+x.nv.forEach(function(p,r){var col=colOf(names,p.ten),reg=dk[p.ten]||[];h+='<tr><th class="nm1">'+esc(p.ten)+'</th>';
+for(var i=0;i<28;i++){var on=!!p.f[i],cl=(on?"on":"e")+" p"+(Math.floor(i/4)%2)+(i%4===3?" dg":"")+(nhap?" mine":"");
+h+='<td class="'+cl+'"'+(on?' style="background:'+col+'"':'')+(nhap?' data-xc="'+r+','+i+'"':'')+'>'+(!on&&reg[i]?'<span style="opacity:.45;font-size:9px">●</span>':'')+(on?'<span style="color:#2B1B06;font-weight:700">✓</span>':'')+'</td>'}
+h+='</tr>'});
+h+='<tr class="ft"><th class="nm1">Cần</th>';for(var i=0;i<28;i++)h+='<td'+(i%4===3?' class="dg"':'')+'>'+(x.can[i]==null?"":x.can[i])+'</td>';h+='</tr>';
+h+='<tr class="ft"><th class="nm1">Đã xếp</th>';for(var i=0;i<28;i++){var k=0;x.nv.forEach(function(p){if(p.f[i])k++});h+='<td class="'+(k>=(+x.can[i]||0)?"ok":"lo")+(i%4===3?" dg":"")+'">'+k+'</td>'}h+='</tr></table></div>';
+if(nhap)h+='<div class="two" style="margin-top:12px"><button class="cta sm2" id="xepduyet">'+(S.xcf?"Bấm lần nữa để chốt":"Duyệt và chốt lịch")+'</button><button class="cta ghost sm2" id="xeplai">Xếp lại</button></div>';
+else h+='<p class="note">Lịch tuần này đã chốt và đã báo cho nhân viên.</p>';
+var w0=$("xlw"),sx=w0?w0.scrollLeft:0;el.innerHTML=h;var w=$("xlw");if(w)w.scrollLeft=sx}
+function xepSet(x){S.xep=x;xepDraw()}
+function xepToggle(td){var a=td.getAttribute("data-xc").split(","),p=S.xep.nv[+a[0]],i=+a[1];if(!p||S.xbusy)return;S.xcf=0;var v=p.f[i]?0:1;p.f[i]=v;xepDraw();S.xbusy=1;
+gs("ccQuanLyXepSua",S.pin,S.xep.tu,p.ten,i,v).then(function(r){S.xbusy=0;if(r&&r.ok)xepSet(r.xep);else{toast((r&&r.msg)||"Chưa lưu được.");xepLoad()}}).catch(function(){S.xbusy=0;toast("Mất kết nối, chưa lưu được ô vừa chạm.");xepLoad()})}
+function xepLai(){if(S.xbusy)return;S.xbusy=1;S.xcf=0;gs("ccQuanLyXepLai",S.pin,S.xep.tu).then(function(r){S.xbusy=0;if(r&&r.ok){xepSet(r.xep);toast("Đã xếp lại theo đăng ký.")}else toast((r&&r.msg)||"Chưa xếp lại được.")}).catch(function(){S.xbusy=0;toast("Mất kết nối.")})}
+function xepDuyet(){if(S.xbusy)return;if(!S.xcf){S.xcf=1;xepDraw();return}S.xbusy=1;S.xcf=0;
+gs("ccQuanLyXepDuyet",S.pin,S.xep.tu).then(function(r){S.xbusy=0;if(r&&r.ok){xepSet(r.xep);toast(r.msg||"Đã chốt lịch.")}else{toast((r&&r.msg)||"Chưa chốt được.");xepDraw()}}).catch(function(){S.xbusy=0;toast("Mất kết nối, chưa chốt. Bấm lại.");xepDraw()})}
 function extraClick(t){var q;
+if((q=t.closest("[data-xc]")))return xepToggle(q),true;
+if(t.closest("#xepduyet"))return xepDuyet(),true;
+if(t.closest("#xeplai"))return xepLai(),true;
  if(t.closest("#bk2")){S.mode="";S.xanh=null;S.xly="";return go(S.tab||"home"),true}
  if((q=t.closest("[data-ca]"))){if(S.kc){S.kc.ca=+q.getAttribute("data-ca");showKc()}return true}
  if(t.closest("#kcrev"))return kcXem(),true;
