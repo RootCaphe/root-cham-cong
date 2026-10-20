@@ -11,7 +11,7 @@ function ghi(ten,ma){try{var o=JSON.parse(localStorage.getItem(KEY)||"{}");if(ma
 function u8(b){var p="=".repeat((4-b.length%4)%4),s=(b+p).replace(/-/g,"+").replace(/_/g,"/"),r=atob(s),o=new Uint8Array(r.length);for(var i=0;i<r.length;i++)o[i]=r.charCodeAt(i);return o}
 function standalone(){return window.matchMedia&&matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}
 function ios(){return/iphone|ipad|ipod/i.test(navigator.userAgent)}
-function card(h){var a=document.querySelector("#scr .acts"),d=document.createElement("div");d.id="pcard";d.className="blk";d.style.marginTop="14px";d.innerHTML=h;var old=document.getElementById("pcard");if(old)old.remove();if(a&&a.parentNode)a.parentNode.insertBefore(d,a.nextSibling)}
+function card(h){var s=document.getElementById("pslot");if(!s)return;s.innerHTML='<div id="pcard" class="blk" style="margin-top:14px">'+h+'</div>'}
 function huong(){var a=ios()?'<ol class="sm" style="margin:8px 0 0 18px;padding:0"><li>Mở <b>Cài đặt</b> của iPhone</li><li>Chọn <b>Thông báo</b>, kéo xuống chọn biểu tượng <b>ROOT</b></li><li>Bật <b>Cho phép thông báo</b></li><li>Quay lại ứng dụng này</li></ol>':'<ol class="sm" style="margin:8px 0 0 18px;padding:0"><li>Giữ biểu tượng ROOT ngoài Màn hình chính, chọn <b>Thông tin ứng dụng</b> (hoặc <b>Cài đặt trang web</b>)</li><li>Chọn <b>Thông báo</b></li><li>Bật <b>Cho phép thông báo</b></li><li>Quay lại ứng dụng này</li></ol>';return a}
 function ui(){
  if(!S.st||S.mode==="ql")return;
@@ -44,7 +44,8 @@ function dongBo(){
  navigator.serviceWorker.register("sw.js").then(function(){return navigator.serviceWorker.ready}).then(function(reg){return reg.pushManager.getSubscription()}).then(function(sub){
   if(!sub){ghi(ten,"");return}
   return gs("ccDangKyBao",ten,pin,sub.toJSON()).then(function(r){if(r&&r.ok&&r.ma!==luu(ten)){ghi(ten,r.ma);return getMa().then(function(a){if(a.indexOf(r.ma)<0)a.push(r.ma);return setMa(a)})}})}).catch(function(){})}
-var _sh=showHome;showHome=function(){_sh.apply(this,arguments);try{ui();dongBo()}catch(e){}};
+var _sh=showHome;showHome=function(){_sh.apply(this,arguments);try{dongBo()}catch(e){}};
+var _st=showTui;showTui=function(){_st.apply(this,arguments);try{ui();dongBo()}catch(e){}};
 document.getElementById("scr").addEventListener("click",function(e){var t=e.target;
  if(t.closest&&t.closest("#pbat"))bat();else if(t.closest&&t.closest("#ptat"))tat();else if(t.closest&&t.closest("#pthu"))thu();else if(t.closest&&t.closest("#phd")){e.preventDefault();var x=document.getElementById("phdn");if(x)x.style.display=x.style.display==="none"?"block":"none"}});
 if(ok&&Notification.permission==="granted"){try{navigator.serviceWorker.register("sw.js")}catch(e){}}
