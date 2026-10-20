@@ -12,12 +12,13 @@ function u8(b){var p="=".repeat((4-b.length%4)%4),s=(b+p).replace(/-/g,"+").repl
 function standalone(){return window.matchMedia&&matchMedia("(display-mode: standalone)").matches||navigator.standalone===true}
 function ios(){return/iphone|ipad|ipod/i.test(navigator.userAgent)}
 function card(h){var a=document.querySelector("#scr .acts"),d=document.createElement("div");d.id="pcard";d.className="blk";d.style.marginTop="14px";d.innerHTML=h;var old=document.getElementById("pcard");if(old)old.remove();if(a&&a.parentNode)a.parentNode.insertBefore(d,a.nextSibling)}
+function huong(){var a=ios()?'<ol class="sm" style="margin:8px 0 0 18px;padding:0"><li>Mở <b>Cài đặt</b> của iPhone</li><li>Chọn <b>Thông báo</b>, kéo xuống chọn biểu tượng <b>ROOT</b></li><li>Bật <b>Cho phép thông báo</b></li><li>Quay lại ứng dụng này</li></ol>':'<ol class="sm" style="margin:8px 0 0 18px;padding:0"><li>Giữ biểu tượng ROOT ngoài Màn hình chính, chọn <b>Thông tin ứng dụng</b> (hoặc <b>Cài đặt trang web</b>)</li><li>Chọn <b>Thông báo</b></li><li>Bật <b>Cho phép thông báo</b></li><li>Quay lại ứng dụng này</li></ol>';return a}
 function ui(){
  if(!S.st||S.mode==="ql")return;
  var ma=luu(S.ten);
  if(!ok){if(ios()&&!standalone())card('<div class="sm" style="margin:0">Để nhận thông báo: thêm trang này vào Màn hình chính (nút Chia sẻ, chọn Thêm vào MH chính), rồi mở từ biểu tượng đó.</div>');return}
- if(Notification.permission==="denied"){card('<div class="sm" style="margin:0">Thông báo đang bị tắt trong Cài đặt của máy. Hãy bật lại thông báo cho trang này.</div>');return}
- if(ma&&Notification.permission==="granted")card('<div style="font-size:15px;font-weight:600">Thông báo: đang bật trên máy này</div><div class="two" style="margin-top:10px"><button class="cta ghost sm2" id="pthu">Gửi thử</button><button class="cta ghost sm2" id="ptat">Tắt</button></div>');
+ if(Notification.permission==="denied"){card('<div style="font-size:15px;font-weight:600">Thông báo đang bị tắt trong máy</div><div class="sm">Làm theo các bước sau để bật lại:</div>'+huong());return}
+ if(ma&&Notification.permission==="granted")card('<div style="font-size:15px;font-weight:600">Thông báo: đang bật trên máy này</div><div class="two" style="margin-top:10px"><button class="cta ghost sm2" id="pthu">Gửi thử</button><button class="cta ghost sm2" id="ptat">Tắt</button></div><div class="sm" style="margin-top:10px"><a href="#" id="phd" style="color:inherit;text-decoration:underline">Không thấy thông báo? Xem cách bật trong máy</a></div><div id="phdn" style="display:none">'+huong()+'</div>');
  else card('<div style="font-size:15px;font-weight:600">Nhận thông báo đổi ca, tăng ca</div><div class="sm">Khi có người nhờ bạn đổi ca hoặc chủ quán duyệt, điện thoại sẽ báo ngay.</div><button class="cta sm2" id="pbat" style="margin-top:10px">Bật thông báo</button>')}
 function bat(){
  if(S.busy)return;S.busy=true;var b=document.getElementById("pbat");if(b){b.disabled=true;b.textContent="Đang bật…"}
@@ -45,6 +46,6 @@ function dongBo(){
   return gs("ccDangKyBao",ten,pin,sub.toJSON()).then(function(r){if(r&&r.ok&&r.ma!==luu(ten)){ghi(ten,r.ma);return getMa().then(function(a){if(a.indexOf(r.ma)<0)a.push(r.ma);return setMa(a)})}})}).catch(function(){})}
 var _sh=showHome;showHome=function(){_sh.apply(this,arguments);try{ui();dongBo()}catch(e){}};
 document.getElementById("scr").addEventListener("click",function(e){var t=e.target;
- if(t.closest&&t.closest("#pbat"))bat();else if(t.closest&&t.closest("#ptat"))tat();else if(t.closest&&t.closest("#pthu"))thu()});
+ if(t.closest&&t.closest("#pbat"))bat();else if(t.closest&&t.closest("#ptat"))tat();else if(t.closest&&t.closest("#pthu"))thu();else if(t.closest&&t.closest("#phd")){e.preventDefault();var x=document.getElementById("phdn");if(x)x.style.display=x.style.display==="none"?"block":"none"}});
 if(ok&&Notification.permission==="granted"){try{navigator.serviceWorker.register("sw.js")}catch(e){}}
 })();
