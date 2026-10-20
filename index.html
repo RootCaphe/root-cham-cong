@@ -2,6 +2,7 @@
 <html lang="vi"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0E2621">
+<link rel="manifest" href="manifest.webmanifest">
 <title>Chấm công Root Coffee</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -338,5 +339,6 @@ $("scr").addEventListener("click",function(e){var t=e.target,q;
 $("scr").addEventListener("keydown",function(e){if(e.key==="Enter"){var q=e.target.closest&&e.target.closest("li[data-i]");if(q)showPin(+q.getAttribute("data-i"))}});
 document.addEventListener("visibilitychange",function(){if(document.hidden)stopCam()});
 ribbon();setInterval(tick,1000);tick();boot();
-</script></body></html>
+</script>
+<script src="push.js"></script></body></html>
 
