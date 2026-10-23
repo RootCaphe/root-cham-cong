@@ -465,26 +465,28 @@ function isoHom(){var n=vn();return n.y+"-"+p2(n.mo)+"-"+p2(n.d)}
 function guessCa(){var n=vn(),m=n.h*60+n.m;return m<570?1:m<810?2:m<1050?3:4}
 function dotTien(s){return String(s).replace(/\B(?=(\d{3})+(?!\d))/g,".")}
 function showKc(){var st=S.st;S.tab="ketca";S.mode="";hero(false);touch();tabs(true);
- var k=S.kc||(S.kc={ngay:isoHom(),ca:guessCa(),mat:"",ck:"",ghi:""});
+ var k=S.kc||(S.kc={ngay:isoHom(),ca:guessCa(),mat:"",ck:"",le:"",ghi:""});
  var h=topbar("Kết ca","Điền sau khi kết ca. Chỉ nhập chữ số, không gõ dấu chấm hay chữ đ.");
  h+='<div class="fld"><label for="kcd">Ngày</label><input class="t" type="date" id="kcd" value="'+k.ngay+'" max="'+isoHom()+'"></div>';
  h+='<div class="fld"><label>Ca</label><div class="cag">'+[1,2,3,4].map(function(c){return'<button data-ca="'+c+'" class="'+(k.ca===c?"on":"")+'">Ca '+c+'<small>'+CAH[c]+'</small></button>'}).join("")+'</div></div>';
  h+='<div class="fld"><label for="kcm">Tiền mặt trong ca</label><div class="amt"><input id="kcm" inputmode="numeric" autocomplete="off" placeholder="0" value="'+dotTien(k.mat)+'"><i>đ</i></div><div class="hp">Đã trừ 200.000đ tiền két.</div></div>';
  h+='<div class="fld"><label for="kck">Tiền chuyển khoản trong ca</label><div class="amt"><input id="kck" inputmode="numeric" autocomplete="off" placeholder="0" value="'+dotTien(k.ck)+'"><i>đ</i></div><div class="hp">Bấm vào “doanh thu thẻ”, lấy số tiền của “bán online”. Không có thì để trống.</div></div>';
+ h+='<div class="fld"><label for="kcl">Cọc tiền lẻ đổi (đếm lại)</label><div class="amt"><input id="kcl" inputmode="numeric" autocomplete="off" placeholder="0" value="'+dotTien(k.le||"")+'"><i>đ</i></div><div class="hp">Đếm số tiền lẻ để sẵn đổi cho khách ở quầy (khoảng 150.000 - 200.000đ). Không tính vào doanh thu.</div></div>';
  h+='<div class="fld"><label for="kcg">Ghi chú (nếu có)</label><textarea id="kcg" rows="2" maxlength="300" placeholder="Ví dụ: hoàn đơn, khách trả thiếu, tiền lẻ…">'+esc(k.ghi)+'</textarea></div>';
  h+='<div class="tot"><span>Tổng thu của ca</span><b id="kct">'+dotTien((+k.mat||0)+(+k.ck||0))+'đ</b></div>';
  h+='<button class="cta" id="kcrev" style="margin-top:18px">Xem lại và gửi</button>';
  $("scr").innerHTML=h}
 function kcDoi(t){var k=S.kc;if(!k)return;
- if(t.id==="kcm"||t.id==="kck"){var d=t.value.replace(/\D/g,"").replace(/^0+(?=\d)/,"").slice(0,9);t.value=dotTien(d);if(t.id==="kcm")k.mat=d;else k.ck=d;$("kct").textContent=dotTien((+k.mat||0)+(+k.ck||0))+"đ"}
+ if(t.id==="kcm"||t.id==="kck"||t.id==="kcl"){var d=t.value.replace(/\D/g,"").replace(/^0+(?=\d)/,"").slice(0,9);t.value=dotTien(d);if(t.id==="kcm")k.mat=d;else if(t.id==="kcl")k.le=d;else k.ck=d;$("kct").textContent=dotTien((+k.mat||0)+(+k.ck||0))+"đ"}
  else if(t.id==="kcg")k.ghi=t.value;else if(t.id==="kcd")k.ngay=t.value}
 function kcXem(){var k=S.kc;if(!k)return;
  if(!/^\d{4}-\d{2}-\d{2}$/.test(k.ngay)){toast("Chọn ngày.");return}
  if(k.mat===""){toast("Nhập tiền mặt trong ca (không có thì nhập 0).");$("kcm").focus();return}
+ if(k.le===""||k.le===undefined){toast("Đếm và nhập cọc tiền lẻ đổi (không còn thì nhập 0).");$("kcl").focus();return}
  var d=k.ngay.split("-"),tong=(+k.mat||0)+(+k.ck||0);
- sheet(true,'<h2>Kiểm tra lại</h2><div class="kv"><span>Người kết ca</span><b>'+esc(S.ten)+'</b></div><div class="kv"><span>Ngày</span><b>'+d[2]+"/"+d[1]+"/"+d[0]+'</b></div><div class="kv"><span>Ca</span><b>Ca '+k.ca+' ('+CAH[k.ca]+')</b></div><div class="kv"><span>Tiền mặt</span><b>'+dotTien(k.mat)+'đ</b></div><div class="kv"><span>Chuyển khoản</span><b>'+dotTien(k.ck||0)+'đ</b></div><div class="kv"><span>Tổng thu</span><b>'+dotTien(tong)+'đ</b></div>'+(k.ghi.trim()?'<div class="kv"><span>Ghi chú</span><b>'+esc(k.ghi.trim())+'</b></div>':'')+'<button class="cta" id="kcsend" style="margin-top:18px">Gửi kết ca</button><button class="cta ghost" id="kcsua" style="margin-top:10px">Sửa lại</button>')}
+ sheet(true,'<h2>Kiểm tra lại</h2><div class="kv"><span>Người kết ca</span><b>'+esc(S.ten)+'</b></div><div class="kv"><span>Ngày</span><b>'+d[2]+"/"+d[1]+"/"+d[0]+'</b></div><div class="kv"><span>Ca</span><b>Ca '+k.ca+' ('+CAH[k.ca]+')</b></div><div class="kv"><span>Tiền mặt</span><b>'+dotTien(k.mat)+'đ</b></div><div class="kv"><span>Chuyển khoản</span><b>'+dotTien(k.ck||0)+'đ</b></div><div class="kv"><span>Cọc tiền lẻ</span><b>'+dotTien(k.le)+'đ</b></div><div class="kv"><span>Tổng thu</span><b>'+dotTien(tong)+'đ</b></div>'+(k.ghi.trim()?'<div class="kv"><span>Ghi chú</span><b>'+esc(k.ghi.trim())+'</b></div>':'')+'<button class="cta" id="kcsend" style="margin-top:18px">Gửi kết ca</button><button class="cta ghost" id="kcsua" style="margin-top:10px">Sửa lại</button>')}
 function kcGui(){if(S.busy||!S.kc)return;var k=S.kc;S.busy=true;var b=$("kcsend");b.disabled=true;b.textContent="Đang gửi…";
- gs("ccKetCa",S.ten,S.pin,k.ngay,k.ca,k.mat,k.ck||"0",k.ghi).then(function(r){S.busy=false;
+ gs("ccKetCa",S.ten,S.pin,k.ngay,k.ca,k.mat,k.ck||"0",k.ghi,k.le||"0").then(function(r){S.busy=false;
   if(r.ok){sheet(false);S.kc=null;showDone(r)}else{toast(r.msg);if(r.khoa){showNames()}else{b.disabled=false;b.textContent="Gửi kết ca"}}
  }).catch(function(){S.busy=false;b.disabled=false;b.textContent="Gửi kết ca";toast("Chưa gửi được vì mất kết nối. Bấm Gửi lại.")})}
 function stopCam(){if(S.stream){S.stream.getTracks().forEach(function(t){t.stop()});S.stream=null}}
