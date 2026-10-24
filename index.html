@@ -464,6 +464,25 @@ function thuNgan(t){var m={"hai":"T2","ba":"T3","tư":"T4","năm":"T5","sáu":"T
 function isoHom(){var n=vn();return n.y+"-"+p2(n.mo)+"-"+p2(n.d)}
 function guessCa(){var n=vn(),m=n.h*60+n.m;return m<570?1:m<810?2:m<1050?3:4}
 function dotTien(s){return String(s).replace(/\B(?=(\d{3})+(?!\d))/g,".")}
+var showQl0=showQl;
+showQl=function(){showQl0();var o=$("out");if(o&&!$("dgbtn")){var w=document.createElement("span");w.style.cssText="display:flex;gap:8px";var b=document.createElement("button");b.className="out";b.id="dgbtn";b.textContent="Giao giờ";o.parentNode.insertBefore(w,o);w.appendChild(b);w.appendChild(o);b.addEventListener("click",showDg)}};
+function showDg(){S.mode="dg";touch();$("scr").innerHTML='<div class="top"><h1 class="h">Giao giờ làm</h1><button class="out" id="dgback">Quay lại</button></div><div class="load">Đang tải…</div>';$("dgback").onclick=function(){showQl()};
+ gs("ccQuanLyDieuChinhDs",S.pin).then(function(r){if(S.mode!=="dg")return;if(!r||!r.ok){toast((r&&r.msg)||"Không tải được.");return}dgDraw(r)}).catch(function(){toast("Mất kết nối. Thử lại sau vài giây.")})}
+function dgDraw(r){var h='<div class="top"><h1 class="h">Giao giờ làm</h1><button class="out" id="dgback">Quay lại</button></div>';
+ h+='<p class="sm" style="margin:4px 0 14px">Dùng khi nhờ ai đó vào sớm hoặc ở lại muộn hơn giờ ca, hoặc làm thay người nghỉ đột xuất. Đến giờ này nhân viên chấm công như bình thường, tính trễ theo giờ mới. Người nghỉ đột xuất vẫn bấm Xin phép (Nghỉ ca) trong app.</p>';
+ h+='<div class="fld"><label class="lb" for="dgn">Nhân viên</label><select class="t" id="dgn">'+r.nv.map(function(n){return'<option>'+esc(n)+'</option>'}).join("")+'</select></div>';
+ h+='<div class="fld"><label class="lb" for="dgd">Ngày</label><input class="t" type="date" id="dgd" value="'+isoHom()+'" min="'+isoHom()+'"></div>';
+ h+='<div class="two"><div><label class="lb" for="dgt">Từ giờ</label><input class="t" type="time" id="dgt" value="08:30"></div><div><label class="lb" for="dgr">Đến giờ</label><input class="t" type="time" id="dgr" value="12:30"></div></div>';
+ h+='<div class="fld"><label class="lb" for="dgg">Ghi chú (nếu có)</label><input class="t" id="dgg" maxlength="100" placeholder="Ví dụ: vào sớm thay ca 2"></div>';
+ h+='<button class="cta" id="dgok" style="margin-top:14px">Giao giờ làm</button>';
+ h+='<h2 class="s">Đã giao (sắp tới)</h2>';
+ if(!r.ds.length)h+='<p class="note" style="text-align:left;margin-top:0">Chưa có mục nào.</p>';
+ r.ds.forEach(function(x){var d=x.ngay.split("-");h+='<div class="blk"><div style="font-size:16px;font-weight:600">'+esc(x.ten)+' · '+d[2]+'/'+d[1]+'</div><div class="sm">'+esc(x.tu)+' đến '+esc(x.den)+(x.ghi?' · '+esc(x.ghi):'')+'</div><button class="cta ghost sm2" style="margin-top:10px" data-dgh="'+x.dong+'">Hủy</button></div>'});
+ $("scr").innerHTML=h;
+ $("dgback").onclick=function(){showQl()};
+ $("dgok").onclick=function(){if(S.busy)return;var ten=$("dgn").value,ng=$("dgd").value,tu=$("dgt").value,den=$("dgr").value;if(!ng||!tu||!den){toast("Điền đủ ngày và giờ.");return}
+  S.busy=true;gs("ccQuanLyDieuChinh",S.pin,ten,ng,tu,den,$("dgg").value).then(function(x){S.busy=false;toast(x.msg||"Xong");if(x.ok&&S.mode==="dg")dgDraw({ok:true,ds:x.ds,nv:r.nv})}).catch(function(){S.busy=false;toast("Mất kết nối. Thử lại sau vài giây.")})};
+ [].forEach.call(document.querySelectorAll("[data-dgh]"),function(b){b.onclick=function(){if(S.busy)return;S.busy=true;gs("ccQuanLyDieuChinhHuy",S.pin,b.getAttribute("data-dgh")).then(function(x){S.busy=false;toast(x.msg||"Xong");if(S.mode==="dg")dgDraw({ok:true,ds:x.ds||[],nv:r.nv})}).catch(function(){S.busy=false;toast("Mất kết nối. Thử lại sau vài giây.")})}})}
 function showKc(){var st=S.st;S.tab="ketca";S.mode="";hero(false);touch();tabs(true);
  var k=S.kc||(S.kc={ngay:isoHom(),ca:guessCa(),mat:"",ck:"",le:"",ghi:""});
  var h=topbar("Kết ca","Điền sau khi kết ca. Chỉ nhập chữ số, không gõ dấu chấm hay chữ đ.");
